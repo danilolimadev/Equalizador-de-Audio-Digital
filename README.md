@@ -1,2 +1,2 @@
-# Equalizador-de-udio-Digital
+# Equalizador-de-Audio-Digital
 Projeto Equalizador de Áudio Digital
