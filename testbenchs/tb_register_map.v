@@ -93,16 +93,16 @@ module tb_reg_map_simple_assign();
 
         // Verificar no terminal
         $display("CONFIGURATION = 0x%h", configuration);
-        $display("GAIN_1        = %0d", $signed(gain_1));
-        $display("GAIN_2        = %0d", $signed(gain_2));
-        $display("GAIN_3        = %0d", $signed(gain_3));
-        $display("GAIN_4        = %0d", $signed(gain_4));
-        $display("GAIN_5        = %0d", $signed(gain_5));
-        $display("GAIN_6        = %0d", $signed(gain_6));
-        $display("GAIN_7        = %0d", $signed(gain_7));
-        $display("GAIN_8        = %0d", $signed(gain_8));
-        $display("GAIN_9        = %0d", $signed(gain_9));
-        $display("GAIN_10       = %0d", $signed(gain_10));
+        $display("GAIN_1        = %0d", gain_1);
+        $display("GAIN_2        = %0d", gain_2);
+        $display("GAIN_3        = %0d", gain_3);
+        $display("GAIN_4        = %0d", gain_4);
+        $display("GAIN_5        = %0d", gain_5);
+        $display("GAIN_6        = %0d", gain_6);
+        $display("GAIN_7        = %0d", gain_7);
+        $display("GAIN_8        = %0d", gain_8);
+        $display("GAIN_9        = %0d", gain_9);
+        $display("GAIN_10       = %0d", gain_10);
 
         // Esperar e encerrar
         #20;
