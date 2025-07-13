@@ -67,56 +67,26 @@ module tb_reg_map_simple_assign();
         // Escrever valor de configuração (regbank[0] = 8'hAA)
         write(0, 8'hAA);
 
-        // Banda 1 = -24 dB → 0xFFFEA0
-        write(1, 8'hA0);  // LSB
-        write(2, 8'hFE);  // MID
-        write(3, 8'hFF);  // MSB
-
-        // Banda 2 = -19 dB → 0xFFFECF
-        write(4, 8'hD3);
-        write(5, 8'hEC);
-        write(6, 8'hFF);
-
-        // Banda 3 = -14 dB → 0xFFFF1E
-        write(7, 8'hE2);
-        write(8, 8'hF1);
-        write(9, 8'hFF);
-
-        // Banda 4 = -9 dB → 0xFFFFA7
-        write(10, 8'h97);
-        write(11, 8'hFA);
-        write(12, 8'hFF);
-
-        // Banda 5 = -4 dB → 0xFFFFFC
-        write(13, 8'hFC);
-        write(14, 8'hFF);
-        write(15, 8'hFF);
-
-        // Banda 6 = +1 dB → 0x000001
-        write(16, 8'h01);
-        write(17, 8'h00);
-        write(18, 8'h00);
-
-        // Banda 7 = +6 dB → 0x000006
-        write(19, 8'h06);
-        write(20, 8'h00);
-        write(21, 8'h00);
-
-        // Banda 8 = +11 dB → 0x00000B
-        write(22, 8'h0B);
-        write(23, 8'h00);
-        write(24, 8'h00);
-
-        // Banda 9 = +16 dB → 0x000010
-        write(25, 8'h10);
-        write(26, 8'h00);
-        write(27, 8'h00);
-
-        // Banda 10 = +21 dB → 0x000015
-        write(28, 8'h15);
-        write(29, 8'h00);
-        write(30, 8'h00);
-
+        // Banda 1 = 0x000000
+        write(1, 8'h00); write(2, 8'h00); write(3, 8'h00);
+        // Banda 2 = 0x1C71C7
+        write(4, 8'hC7); write(5, 8'h71); write(6, 8'h1C);
+        // Banda 3 = 0x38E38E
+        write(7, 8'h8E); write(8, 8'hE3); write(9, 8'h38);
+        // Banda 4 = 0x553F55
+        write(10, 8'h55); write(11, 8'h3F); write(12, 8'h55);
+        // Banda 5 = 0x71AB1E
+        write(13, 8'h1E); write(14, 8'hAB); write(15, 8'h71);
+        // Banda 6 = 0x8E16E6
+        write(16, 8'hE6); write(17, 8'h16); write(18, 8'h8E);
+        // Banda 7 = 0xAA82AF
+        write(19, 8'hAF); write(20, 8'h82); write(21, 8'hAA);
+        // Banda 8 = 0xC6EE78
+        write(22, 8'h78); write(23, 8'hEE); write(24, 8'hC6);
+        // Banda 9 = 0xE35A41
+        write(25, 8'h41); write(26, 8'h5A); write(27, 8'hE3);
+        // Banda 10 = 0xFFFFFF
+        write(28, 8'hFF); write(29, 8'hFF); write(30, 8'hFF);
 
         // Esperar propagação
         #10;
@@ -136,7 +106,7 @@ module tb_reg_map_simple_assign();
 
         // Esperar e encerrar
         #20;
-        $finish;
+        $stop;
     end
 
     // Tarefa para escrever no regbank
