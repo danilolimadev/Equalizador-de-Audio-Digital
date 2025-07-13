@@ -7,7 +7,7 @@ module top_module (
     input wire [23:0] audio_in,  // Entrada de áudio (24 bits)
     output wire [23:0] audio_out,// Saída de áudio (24 bits)
     input wire audio_valid,      // Indica dado de áudio válido
-    output wire audio_ready,     // Indica pronto para receber novo dado
+    output wire audio_ready     // Indica pronto para receber novo dado
 );
 
 //Recebe comandos via I2C e envia dados e endereço de registrador ao bloco de controle; gera sinal para escrita nos registradores.
@@ -22,15 +22,27 @@ module i2c_slave (
 );
 
 //Armazena os valores de configuração recebidos via I2C e os disponibiliza para o equalizador.
-module reg_file (
+module reg_map #(
+    parameter GAIN_WIDTH = 24,    
+    parameter ADDR_WIDTH = 31      
+)(
     input wire clk,                     // Clock
-    input wire rst_n,                   // Reset em 0
-    input wire [7:0] addr,              // Endereço do registrador para leitura/escrita
-    input wire [7:0] data_in,           // Dados de entrada para gravação no registrador
-    input wire write_enable,            // Sinal para habilitar escrita nos registradores
-    output reg [15:0] param_band1_gain, // Parâmetro de ganho para banda 1 do equalizador
-    output reg [15:0] param_band2_gain, // Parâmetro de ganho para banda 2 do equalizador
-    output reg [15:0] param_band3_gain  // Parâmetro de ganho para banda 3 do equalizador
+    input wire rst,                     // Reset em 0
+    input wire we,                      // Sinal para habilitar escrita nos registradores
+    input wire [ADDR_WIDTH-1:0] addr,   // Endereço do registrador para leitura/escrita 
+    input wire [7:0] data_in,           // Dados de entrada para gravação no registrador (1 byte -> devido ao i2c)
+    output [7:0] configuration,         // Para armazenar bits de configuração 
+    output reg [GAIN_WIDTH-1:0] gain_1, // Parâmetro de ganho para banda 1 do equalizador
+    output reg [GAIN_WIDTH-1:0] gain_2, // Parâmetro de ganho para banda 2 do equalizador
+    output reg [GAIN_WIDTH-1:0] gain_3, // Parâmetro de ganho para banda 3 do equalizador
+    output reg [GAIN_WIDTH-1:0] gain_4, // Parâmetro de ganho para banda 4 do equalizador
+    output reg [GAIN_WIDTH-1:0] gain_5, // Parâmetro de ganho para banda 5 do equalizador
+    output reg [GAIN_WIDTH-1:0] gain_6, // Parâmetro de ganho para banda 6 do equalizador
+    output reg [GAIN_WIDTH-1:0] gain_7, // Parâmetro de ganho para banda 7 do equalizador
+    output reg [GAIN_WIDTH-1:0] gain_8, // Parâmetro de ganho para banda 8 do equalizador
+    output reg [GAIN_WIDTH-1:0] gain_9, // Parâmetro de ganho para banda 9 do equalizador
+    output reg [GAIN_WIDTH-1:0] gain_10 // Parâmetro de ganho para banda 10 do equalizador
+
 );
 
 //Aplica os ganhos nas bandas de frequência do sinal de áudio
