@@ -26,7 +26,7 @@ module reg_map #(
     integer i;
     always @(posedge clk or negedge rst) begin
         if (!rst) begin
-            for (i = 0; i < 30; i = i + 1)
+            for (i = 0; i < 31; i = i + 1)
                 regbank[i] <= 8'd0;
         end else if (we) begin
             regbank[addr] <= data_in;
