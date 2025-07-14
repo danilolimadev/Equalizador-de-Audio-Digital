@@ -41,7 +41,7 @@ for name, f1, f2 in bands:
             f.write(f"{q & 0xFFFF:04X}\n")
     file_paths.append(filepath)
 
-# Opcional: salvar todos em um zip
+# Salvar todos em um zip
 zip_path = "fir_bands_equalizer.zip"
 with zipfile.ZipFile(zip_path, 'w') as zipf:
     for file in file_paths:
