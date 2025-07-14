@@ -23,7 +23,7 @@ module tb_audio_equalizer;
     wire audio_ready;
 
     // DUT
-    top_module dut (
+    /*top_module dut (
         .clk(clk),
         .rst_n(rst_n),
         .i2c_scl(i2c_scl),
@@ -32,20 +32,30 @@ module tb_audio_equalizer;
         .audio_out(audio_out),
         .audio_valid(audio_valid),
         .audio_ready(audio_ready)
-    );
+    );*/
+
+    //PARA TESTAR GERAR O ARQUIVO IGUAL, SOMENTE PARA COMPARAÇÃO
+    assign audio_out = audio_in;    // Pass-through sem alteração
+    assign audio_ready = 1'b1;      // Sempre pronto para receber dados
 
     // WAV leitura
     integer wav_file;
     integer file_out;
     reg [7:0] b0, b1, b2;
     reg [23:0] sample;
-    reg [7:0] buf [0:3];
+    reg [7:0] buffer [0:3];
     integer found_data = 0;
     integer data_size = 0;
     integer c;
 
     // I2C parâmetros
     parameter I2C_ADDR = 7'b10101010; //Valor aleatório
+
+    // File parameters
+    reg [7:0] header_byte;
+    integer i;
+    reg doneFile; // Variável de controle
+    reg [1:0] endFile; // Variavel de controle que indica o final do arquivo
 
     // Tasks I2C master
     task i2c_start(); //Start: SDA faz a transição do estado ALTO para o estado BAIXO, enquanto o SCL é ALTO.
@@ -141,40 +151,40 @@ module tb_audio_equalizer;
             $stop;
         end
 
-        // Copiar cabeçalho WAV (44 bytes típicos)
-        integer i;
-        reg [7:0] header_byte;
-        for (i = 0; i < 44; i = i + 1) begin
-            if ($fread(header_byte, wav_file) != 1) begin
-                $display("Erro ao ler cabeçalho");
-                $stop;
-            end
-            $fwrite(file_out, "%c", header_byte);
-        end
-
         // Procurar chunk "data" para verificar se é um arquivo válido, o áudio válido ocorre somente após "data": 0x64, 0x61, 0x74, 0x61
         found_data = 0;
-        buf[0] = 0; buf[1] = 0; buf[2] = 0; buf[3] = 0;
+        buffer[0] = 0; buffer[1] = 0; buffer[2] = 0; buffer[3] = 0;
 
-        while (!$feof(wav_file)) begin ////$feof é utilizado para verificar final do arquivo 
-            buf[0] = buf[1];
-            buf[1] = buf[2];
-            buf[2] = buf[3];
+        doneFile = 0;
+        endFile = 0;
+        while (!$feof(wav_file) && !doneFile) begin ////$feof é utilizado para verificar final do arquivo 
+            buffer[0] = buffer[1];
+            buffer[1] = buffer[2];
+            buffer[2] = buffer[3];
             c = $fgetc(wav_file);
-            if (c == -1) break;
-            buf[3] = c[7:0];
+            if (c == -1) doneFile = 1;
+            else begin
+                $fwrite(file_out, "%c", c);
+                buffer[3] = c[7:0];
 
-            if (buf[0] == 8'h64 && buf[1] == 8'h61 && buf[2] == 8'h74 && buf[3] == 8'h61) begin
-                found_data = 1;
-                $display("Chunk 'data' encontrado");
+                if (buffer[0] == 8'h64 && buffer[1] == 8'h61 && buffer[2] == 8'h74 && buffer[3] == 8'h61) begin
+                    found_data = 1;
+                    $display("Chunk 'data' encontrado");
 
-                buf[0] = $fgetc(wav_file);
-                buf[1] = $fgetc(wav_file);
-                buf[2] = $fgetc(wav_file);
-                buf[3] = $fgetc(wav_file);
-                data_size = buf[0] + (buf[1] << 8) + (buf[2] << 16) + (buf[3] << 24);
-                $display("Tamanho do chunk 'data' = %0d bytes", data_size);
-                break;
+                    buffer[0] = $fgetc(wav_file);
+                    buffer[1] = $fgetc(wav_file);
+                    buffer[2] = $fgetc(wav_file);
+                    buffer[3] = $fgetc(wav_file);
+                    $fwrite(file_out, "%c%c%c%c",
+                        buffer[0],
+                        buffer[1],
+                        buffer[2],
+                        buffer[3]
+                    );
+                    data_size = buffer[0] + (buffer[1] << 8) + (buffer[2] << 16) + (buffer[3] << 24);
+                    $display("Tamanho do chunk 'data' = %0d bytes", data_size);
+                    doneFile = 1;
+                end
             end
         end
 
@@ -183,26 +193,50 @@ module tb_audio_equalizer;
             $stop;
         end
 
+        doneFile = 0;
         // Leitura e envio dos samples
-        while (!$feof(wav_file)) begin
+        while (!$feof(wav_file) && !doneFile) begin
             if (audio_ready) begin
-                if ($fread(b0, wav_file) != 1) break;
-                if ($fread(b1, wav_file) != 1) break;
-                if ($fread(b2, wav_file) != 1) break;
+                if ($fread(b0, wav_file) != 1) doneFile = 1;
+                if ($fread(b1, wav_file) != 1) begin
+                    endFile = 1;
+                    b1 = 0;
+                    b2 = 0;
+                end
+                if ($fread(b2, wav_file) != 1) begin
+                    endFile = 2;
+                    b2 = 0;
+                end
+                if (!doneFile) begin
+                    sample = {b2, b1, b0};
+                    audio_in <= sample;
+                    audio_valid <= 1;
+                    #20;
+                    audio_valid <= 0;
 
-                sample = {b2, b1, b0};
-                audio_in <= sample;
-                audio_valid <= 1;
-                #20;
-                audio_valid <= 0;
-
-                // Espera processamento e escreve a saída no arquivo
-                #20;
-                $fwrite(file_out, "%c%c%c",
-                    audio_out[23:16],
-                    audio_out[15:8],
-                    audio_out[7:0]
-                );
+                    // Espera processamento e escreve a saída no arquivo
+                    #20;
+                    if(endFile == 1) begin
+                        doneFile = 1;
+                        $fwrite(file_out, "%c",
+                            audio_out[7:0]
+                        );
+                    end
+                    else if(endFile == 2) begin
+                        doneFile = 1;
+                        $fwrite(file_out, "%c%c",
+                            audio_out[7:0],
+                            audio_out[15:8]
+                        );
+                    end
+                    else begin
+                        $fwrite(file_out, "%c%c%c",
+                            audio_out[7:0],
+                            audio_out[15:8],
+                            audio_out[23:16]
+                        );
+                    end
+                end
             end
             #20;
         end
