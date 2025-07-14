@@ -59,8 +59,6 @@ module tb_reg_map_simple_assign();
         we = 0;
         addr = 0;
         data_in = 0;
-
-        // Reset
         #12 rst = 1;
 
         // Escrever valor de configuração (regbank[0] = 8'hAA)
@@ -103,13 +101,12 @@ module tb_reg_map_simple_assign();
         $display("GAIN_9        = %0d", gain_9);
         $display("GAIN_10       = %0d", gain_10);
 
-        // Esperar e encerrar
         #20;
         $stop;
     end
 
     // Tarefa para escrever no regbank
-    task write(input [ADDR_WIDTH-1:0] a, input [7:0] d);
+    task write(input [7:0] a, input [7:0] d);
         begin
             @(posedge clk);
             addr = a;
