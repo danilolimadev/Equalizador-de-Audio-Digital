@@ -3,8 +3,8 @@
 module tb_equalizer();
     reg clk;
     reg rst_n;
-    reg signed [23:0] audio_in;
-    wire signed [23:0] audio_out;
+    reg signed [31:0] audio_in;
+    wire signed [31:0] audio_out;
 
     equalizer inst (
         .clk(clk),
