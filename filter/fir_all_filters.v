@@ -12,11 +12,16 @@ module fir_all_filters (
     output wire signed [23:0]  o_band_2k_4k,
     output wire signed [23:0]  o_band_4k_8k,
     output wire signed [23:0]  o_band_8k_16k,
-    output wire signed [23:0]  o_hp // highpass
+    output wire signed [23:0]  o_hp, // highpass
+    output wire signed [23:0]  o_sum // sum of all filters
 );
 
-    // lembrete sobre caminhos .hex, como você já comentou
-
+    /*
+       só um lembrete, todos os arquivos .hex estão configurados pro caminho no meu pc
+       se for precisar alterar o caminho, vai ter que mudar em todos os ".COEF_FILE"
+       por algum motivo, não conseguir testar deixando eles na raiz do projeto...
+    */
+    
     fir_parameterizable_filter #(
         .N(255), .COEF_FILE("C:/coefficients/coef_LP.hex")
     ) fir_lp (
@@ -86,5 +91,9 @@ module fir_all_filters (
         .i_clk(i_clk), .i_rst_n(i_rst_n), .i_en(i_en),
         .i_data(i_data), .o_data(o_hp)
     );
+
+    assign o_sum =
+        (o_lp + o_band_64_125 + o_band_125_250 + o_band_250_500 + o_band_500_1k +
+         o_band_1k_2k + o_band_2k_4k + o_band_4k_8k + o_band_8k_16k + o_hp);
 
 endmodule
