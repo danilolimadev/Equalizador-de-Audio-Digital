@@ -1,11 +1,10 @@
 module reg_map #(
-    parameter GAIN_WIDTH = 24,    
-    parameter ADDR_WIDTH = 31      
+    parameter GAIN_WIDTH = 24    
 )(
     input clk,
     input rst,
     input we,
-    input [ADDR_WIDTH-1:0] addr,
+    input [7:0] addr,
     input [7:0] data_in, 
     output [7:0] configuration, 
     output [GAIN_WIDTH-1:0] gain_1,
@@ -20,7 +19,7 @@ module reg_map #(
     output [GAIN_WIDTH-1:0] gain_10
 );
     // Banco de 31 registradores de 8 bits (3 bytes por ganho)
-    reg [7:0] regbank [0:ADDR_WIDTH-1];
+    reg [7:0] regbank [0:30];
 
     // Escrita e reset
     integer i;

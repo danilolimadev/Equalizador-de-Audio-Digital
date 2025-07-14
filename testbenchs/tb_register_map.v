@@ -4,13 +4,12 @@ module tb_reg_map_simple_assign();
 
     // Parâmetros
     parameter GAIN_WIDTH = 24;
-    parameter ADDR_WIDTH = 31;
 
     // Entradas
     reg clk;
     reg rst;
     reg we;
-    reg [ADDR_WIDTH-1:0] addr;
+    reg [7:0] addr;
     reg [7:0] data_in;
 
     // Saídas
