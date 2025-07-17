@@ -3,24 +3,14 @@ module equalizer (
     input clk, rst_n, 
     output wire [23:0] audio_out
 );
-    // Sinais de controle para o banco de registradores
-    wire we = 1'b0; // Por enquanto, sem escrita (apenas leitura)
-    wire [30:0] addr = 31'd0; // Endereço 0
-    wire [7:0] data_in = 8'd0; // Dados de entrada (não usado na leitura)
-    wire [7:0] configuration;
     
-    // Sinais de ganho das 10 faixas
-    wire [23:0] gain_1, gain_2, gain_3, gain_4, gain_5,
+    // Sinais de ganho das 10 faixas 
+    // Banco de 10 registradores de 13 bits 
+    wire [12:0] gain_1, gain_2, gain_3, gain_4, gain_5,
                 gain_6, gain_7, gain_8, gain_9, gain_10;
     
-    // Instancia o banco de registradores
+    // Instancia o banco de registradores de 13 bits 
     reg_map regs_inst (
-        .clk(clk),
-        .rst(rst_n),
-        .we(we),
-        .addr(addr),
-        .data_in(data_in),
-        .configuration(configuration),
         .gain_1(gain_1),
         .gain_2(gain_2),
         .gain_3(gain_3),
@@ -33,43 +23,32 @@ module equalizer (
         .gain_10(gain_10)
     );
 
-    // Instancia os filtros FIR para cada faixa
-    wire signed [23:0] filter_out_1, filter_out_2, filter_out_3, filter_out_4, filter_out_5,
-                        filter_out_6, filter_out_7, filter_out_8, filter_out_9, filter_out_10;
-    
-    // Filtro 1
-    fir_lpf filer1_inst (.i_clk(clk), .i_rst_n(rst_n), .i_en(1'b1), .i_data(audio_in), .o_data(filter_out_1));
-    
-    // Filtro 2
-    fir_lpf filter2_inst (.i_clk(clk), .i_rst_n(rst_n), .i_en(1'b1), .i_data(audio_in), .o_data(filter_out_2));
-    
-    // Filtro 3
-    fir_lpf filter3_inst (.i_clk(clk), .i_rst_n(rst_n), .i_en(1'b1), .i_data(audio_in), .o_data(filter_out_3));
-    
-    // Filtro 4
-    fir_lpf filter4_inst (.i_clk(clk), .i_rst_n(rst_n), .i_en(1'b1), .i_data(audio_in), .o_data(filter_out_4));
-    
-    // Filtro 5
-    fir_lpf filter5_inst (.i_clk(clk), .i_rst_n(rst_n), .i_en(1'b1), .i_data(audio_in), .o_data(filter_out_5));
-    
-    // Filtro 6
-    fir_lpf filter6_inst (.i_clk(clk), .i_rst_n(rst_n), .i_en(1'b1), .i_data(audio_in), .o_data(filter_out_6));
-    
-    // Filtro 7
-    fir_lpf filter7_inst (.i_clk(clk), .i_rst_n(rst_n), .i_en(1'b1), .i_data(audio_in), .o_data(filter_out_7));
-    
-    // Filtro 8
-    fir_lpf filter8_inst (.i_clk(clk), .i_rst_n(rst_n), .i_en(1'b1), .i_data(audio_in), .o_data(filter_out_8));
-    
-    // Filtro 9
-    fir_lpf filter9_inst (.i_clk(clk), .i_rst_n(rst_n), .i_en(1'b1), .i_data(audio_in), .o_data(filter_out_9));
-    
-    // Filtro 10
-    fir_lpf filter10_inst (.i_clk(clk), .i_rst_n(rst_n), .i_en(1'b1), .i_data(audio_in), .o_data(filter_out_10));
+    // Instancia os filtros FIR para cada faixa, com apenas uma instância
+    wire signed [23:0] o_lp, o_band_64_125, o_band_125_250, o_band_250_500, o_band_500_1k, o_band_1k_2k,
+                        o_band_2k_4k, o_band_4k_8k, o_band_8k_16k, o_hp;
+
+                        fir_all_filters inst_filter (
+                        //     .i_clk(i_clk),
+                        //     .i_rst_n(i_rst_n),
+                        //     .i_en(i_en),
+                            .i_data(i_data),
+                            .o_lp(o_lp),
+                            .o_band_64_125(o_band_64_125),
+                            .o_band_125_250(o_band_125_250),
+                            .o_band_250_500(o_band_250_500),
+                            .o_band_500_1k(o_band_500_1k),
+                            .o_band_1k_2k(o_band_1k_2k),
+                            .o_band_2k_4k(o_band_2k_4k),
+                            .o_band_4k_8k(o_band_4k_8k),
+                            .o_band_8k_16k(o_band_8k_16k),
+                            .o_hp(o_hp)
+                        );
 
     // Multiplicação dos filtros pelos ganhos
-    //Utilizei a palavra weighted por ser mais profissional e clara para ponderado ~pesquisei~
-    wire signed [47:0] weighted_1, weighted_2, weighted_3, weighted_4, weighted_5,
+    // Depois é realizado o truncamento para voltar a ter 24 bits. audio_out[39:16]. 
+    // 39 porque é desconsiderado o bit de sinal que é o bit 40. 
+    // E 16 porque são desconsiderados os bits menos significativos (é um arredondamento do valor).
+    wire signed [40:0] weighted_1, weighted_2, weighted_3, weighted_4, weighted_5,
                         weighted_6, weighted_7, weighted_8, weighted_9, weighted_10;
     
     assign weighted_1 = filter_out_1 * gain_1;
@@ -84,13 +63,13 @@ module equalizer (
     assign weighted_10 = filter_out_10 * gain_10;
 
     // Soma das saídas dos filtros
-    wire signed [47:0] sum_out;
+    wire signed [40:0] sum_out;
     assign sum_out = weighted_1 + weighted_2 + weighted_3 + weighted_4 + weighted_5 +
                      weighted_6 + weighted_7 + weighted_8 + weighted_9 + weighted_10;
 
     // Truncamento para 24 bits
-    assign audio_out = sum_out[47:24]; // Ajuste o truncamento conforme necessário. 
-    //Precisa-se verificar os valores mais importantes a serem truncados. 
-    //Verificar bit [47] < por geralmente indicar sinal
+    assign audio_out = sum_out[39:16]; // Ajuste o truncamento conforme necessário  24bits
+    //Precisa-se verificar os valores mais importantes a serem truncados
+    //Verificar bit [47] < por geralmente indicar sinal, garantir q volte a 24
 
 endmodule
