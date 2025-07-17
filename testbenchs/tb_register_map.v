@@ -83,18 +83,17 @@ module tb_reg_map_simple_assign();
         // Esperar propagação
         #10;
 
-        // Verificar no terminal
-        $display("CONFIGURATION = 0x%h", configuration);
-        $display("GAIN_1        = %0d", gain_1);
-        $display("GAIN_2        = %0d", gain_2);
-        $display("GAIN_3        = %0d", gain_3);
-        $display("GAIN_4        = %0d", gain_4);
-        $display("GAIN_5        = %0d", gain_5);
-        $display("GAIN_6        = %0d", gain_6);
-        $display("GAIN_7        = %0d", gain_7);
-        $display("GAIN_8        = %0d", gain_8);
-        $display("GAIN_9        = %0d", gain_9);
-        $display("GAIN_10       = %0d", gain_10);
+       // Exibir ganhos Q5.8 com separação de parte inteira e fracionária
+      $display("GAIN_1   = %05b_%08b", gain_1[12:8], gain_1[7:0]);
+      $display("GAIN_2   = %05b_%08b", gain_2[12:8], gain_2[7:0]);
+      $display("GAIN_3   = %05b_%08b", gain_3[12:8], gain_3[7:0]);
+      $display("GAIN_4   = %05b_%08b", gain_4[12:8], gain_4[7:0]);
+      $display("GAIN_5   = %05b_%08b", gain_5[12:8], gain_5[7:0]);
+      $display("GAIN_6   = %05b_%08b", gain_6[12:8], gain_6[7:0]);
+      $display("GAIN_7   = %05b_%08b", gain_7[12:8], gain_7[7:0]);
+      $display("GAIN_8   = %05b_%08b", gain_8[12:8], gain_8[7:0]);
+      $display("GAIN_9   = %05b_%08b", gain_9[12:8], gain_9[7:0]);
+      $display("GAIN_10  = %05b_%08b", gain_10[12:8], gain_10[7:0]);
 
         #20;
         $stop;
