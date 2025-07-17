@@ -31,7 +31,7 @@ module equalizer (
                         //     .i_clk(i_clk),
                         //     .i_rst_n(i_rst_n),
                         //     .i_en(i_en),
-                            .i_data(i_data),
+                            .i_data(audio_in),
                             .o_lp(o_lp),
                             .o_band_64_125(o_band_64_125),
                             .o_band_125_250(o_band_125_250),
@@ -45,9 +45,6 @@ module equalizer (
                         );
 
     // Multiplicação dos filtros pelos ganhos
-    // Depois é realizado o truncamento para voltar a ter 24 bits. audio_out[39:16]. 
-    // 39 porque é desconsiderado o bit de sinal que é o bit 40. 
-    // E 16 porque são desconsiderados os bits menos significativos (é um arredondamento do valor).
     wire signed [40:0] weighted_1, weighted_2, weighted_3, weighted_4, weighted_5,
                         weighted_6, weighted_7, weighted_8, weighted_9, weighted_10;
     
@@ -69,7 +66,8 @@ module equalizer (
 
     // Truncamento para 24 bits
     assign audio_out = sum_out[39:16]; // Ajuste o truncamento conforme necessário  24bits
-    //Precisa-se verificar os valores mais importantes a serem truncados
-    //Verificar bit [47] < por geralmente indicar sinal, garantir q volte a 24
+    // Depois é realizado o truncamento para voltar a ter 24 bits. audio_out[39:16]. 
+    // 39 porque é desconsiderado o bit de sinal que é o bit 40. 
+    // E 16 porque são desconsiderados os bits menos significativos (é um arredondamento do valor).
 
 endmodule
