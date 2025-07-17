@@ -1,6 +1,6 @@
 module converter_Q5_8 ( 
-    input [5:0] gain_in
-    output reg [12:0] gain_out,
+    input [5:0] gain_in,
+    output reg [12:0] gain_out
 );
     always @* begin 
         case (gain_in)
@@ -37,7 +37,7 @@ module converter_Q5_8 (
             6'b010000:
                 gain_out = 13'b00001_00000000; // 1
             6'b010001:
-                gain_out = 13'b00000_00000000; // 0
+                gain_out = 13'b00001_00000000; // 0 -> 1
             6'b010010:
                 gain_out = 13'b00001_00000000; // 1
             6'b010011:

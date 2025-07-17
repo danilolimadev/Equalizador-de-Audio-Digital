@@ -78,7 +78,7 @@ module tb_reg_map_simple_assign();
         //Banda 9
         write(8, 8'd32);
         //Banda 10 
-        write(9, 8'd34);
+        write(9, 8'd33);
 
         // Esperar propagação
         #10;

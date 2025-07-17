@@ -19,6 +19,14 @@ module reg_map #(
 );
     // Banco de 10 registradores de 13 bits 
     reg [12:0] regbank [0:9];
+    
+
+    wire [12:0] data_converted;
+
+    converter_Q5_8 converter_inst ( 
+        data_in,
+        data_converted
+    );
 
     // Escrita e reset
     integer i;
@@ -27,11 +35,9 @@ module reg_map #(
             for (i = 0; i < 10; i = i + 1)
                 regbank[i] <= 13'd0;
         end else if (we) begin
-            regbank[addr] <= data_in;
+            regbank[addr] <= data_converted;
         end
     end
-
-    //ACRESCENTAR CONVERSÃO PARA Q5.8
 
     //Criação dos ganhos e seus respectivos mapas de registros
     assign gain_1  = regbank[0];
