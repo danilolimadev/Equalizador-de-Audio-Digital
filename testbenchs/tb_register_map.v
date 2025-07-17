@@ -3,7 +3,7 @@
 module tb_reg_map_simple_assign();
 
     // Parâmetros
-    parameter GAIN_WIDTH = 24;
+    parameter GAIN_WIDTH = 13; //Q5.8
 
     // Entradas
     reg clk;
@@ -13,7 +13,6 @@ module tb_reg_map_simple_assign();
     reg [7:0] data_in;
 
     // Saídas
-    wire [7:0] configuration;
     wire [GAIN_WIDTH-1:0] gain_1;
     wire [GAIN_WIDTH-1:0] gain_2;
     wire [GAIN_WIDTH-1:0] gain_3;
@@ -32,7 +31,6 @@ module tb_reg_map_simple_assign();
         .we(we),
         .addr(addr),
         .data_in(data_in),
-        .configuration(configuration),
         .gain_1(gain_1),
         .gain_2(gain_2),
         .gain_3(gain_3),
@@ -61,29 +59,26 @@ module tb_reg_map_simple_assign();
         data_in = 0;
         #12 rst = 1;
 
-        // Escrever valor de configuração (regbank[0] = 8'hAA)
-        write(0, 8'hAA);
-
-        // Banda 1 = 0x000000
-        write(1, 8'h00); write(2, 8'h00); write(3, 8'h00);
-        // Banda 2 = 0x1C71C7
-        write(4, 8'hC7); write(5, 8'h71); write(6, 8'h1C);
-        // Banda 3 = 0x38E38E
-        write(7, 8'h8E); write(8, 8'hE3); write(9, 8'h38);
-        // Banda 4 = 0x553F55
-        write(10, 8'h55); write(11, 8'h3F); write(12, 8'h55);
-        // Banda 5 = 0x71AB1E
-        write(13, 8'h1E); write(14, 8'hAB); write(15, 8'h71);
-        // Banda 6 = 0x8E16E6
-        write(16, 8'hE6); write(17, 8'h16); write(18, 8'h8E);
-        // Banda 7 = 0xAA82AF
-        write(19, 8'hAF); write(20, 8'h82); write(21, 8'hAA);
-        // Banda 8 = 0xC6EE78
-        write(22, 8'h78); write(23, 8'hEE); write(24, 8'hC6);
-        // Banda 9 = 0xE35A41
-        write(25, 8'h41); write(26, 8'h5A); write(27, 8'hE3);
-        // Banda 10 = 0xFFFFFF
-        write(28, 8'hFF); write(29, 8'hFF); write(30, 8'hFF);
+        //Banda 1 
+        write(0, 8'd1);
+        //Banda 2 
+        write(1, 8'd5);
+        //Banda 3 
+        write(2, 8'd9);
+        //Banda 4 
+        write(3, 8'd13);
+        //Banda 5 
+        write(4, 8'd17);
+        //Banda 6
+        write(5, 8'd21);
+        //Banda 7
+        write(6, 8'd25);
+        //Banda 8
+        write(7, 8'd29);
+        //Banda 9
+        write(8, 8'd32);
+        //Banda 10 
+        write(9, 8'd34);
 
         // Esperar propagação
         #10;
