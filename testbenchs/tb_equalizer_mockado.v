@@ -1,0 +1,187 @@
+`timescale 1ns / 1ps
+module equalizer_mockado(
+  input  wire [23:0] audio_in,
+  input clk,
+  input rst_n,
+
+  input signed [15:0] filter_out_1,
+  input signed [15:0] filter_out_2,
+  input signed [15:0] filter_out_3,
+  input signed [15:0] filter_out_4,
+  input signed [15:0] filter_out_5,
+  input signed [15:0] filter_out_6,
+  input signed [15:0] filter_out_7,
+  input signed [15:0] filter_out_8,
+  input signed [15:0] filter_out_9,
+  input signed [15:0] filter_out_10,
+
+  input [12:0] gain_1,
+  input [12:0] gain_2,
+  input [12:0] gain_3,
+  input [12:0] gain_4,
+  input [12:0] gain_5,
+  input [12:0] gain_6,
+  input [12:0] gain_7,
+  input [12:0] gain_8,
+  input [12:0] gain_9,
+  input [12:0] gain_10,
+
+  output wire [23:0] audio_out
+);
+
+
+    
+    /*
+    // Sinais de ganho das 10 faixas 
+    // Banco de 10 registradores de 13 bits 
+    wire [12:0] gain_1, gain_2, gain_3, gain_4, gain_5,
+                gain_6, gain_7, gain_8, gain_9, gain_10;
+
+    reg signed [15:0] filter_out_1, filter_out_2, filter_out_3, filter_out_4, filter_out_5;
+    reg signed [15:0] filter_out_6, filter_out_7, filter_out_8, filter_out_9, filter_out_10;
+    
+    // Instancia o banco de registradores de 13 bits 
+    reg_map regs_inst (
+        .gain_1(gain_1),
+        .gain_2(gain_2),
+        .gain_3(gain_3),
+        .gain_4(gain_4),
+        .gain_5(gain_5),
+        .gain_6(gain_6),
+        .gain_7(gain_7),
+        .gain_8(gain_8),
+        .gain_9(gain_9),
+        .gain_10(gain_10)
+    );
+
+    // Instancia os filtros FIR para cada faixa, com apenas uma instância
+    wire signed [23:0] o_lp, o_band_64_125, o_band_125_250, o_band_250_500, o_band_500_1k, o_band_1k_2k,
+                        o_band_2k_4k, o_band_4k_8k, o_band_8k_16k, o_hp;
+
+                        fir_all_filters inst_filter (
+                        //     .i_clk(i_clk),
+                        //     .i_rst_n(i_rst_n),
+                        //     .i_en(i_en),
+                            .i_data(i_data),
+                            .o_lp(o_lp),
+                            .o_band_64_125(o_band_64_125),
+                            .o_band_125_250(o_band_125_250),
+                            .o_band_250_500(o_band_250_500),
+                            .o_band_500_1k(o_band_500_1k),
+                            .o_band_1k_2k(o_band_1k_2k),
+                            .o_band_2k_4k(o_band_2k_4k),
+                            .o_band_4k_8k(o_band_4k_8k),
+                            .o_band_8k_16k(o_band_8k_16k),
+                            .o_hp(o_hp)
+                        ); */
+
+    // Multiplicação dos filtros pelos ganhos
+    // Depois é realizado o truncamento para voltar a ter 24 bits. audio_out[39:16]. 
+    // 39 porque é desconsiderado o bit de sinal que é o bit 40. 
+    // E 16 porque são desconsiderados os bits menos significativos (é um arredondamento do valor).
+    wire signed [40:0] weighted_1, weighted_2, weighted_3, weighted_4, weighted_5,
+                        weighted_6, weighted_7, weighted_8, weighted_9, weighted_10;
+    
+    assign weighted_1 = filter_out_1 * gain_1;
+    assign weighted_2 = filter_out_2 * gain_2;
+    assign weighted_3 = filter_out_3 * gain_3;
+    assign weighted_4 = filter_out_4 * gain_4;
+    assign weighted_5 = filter_out_5 * gain_5;
+    assign weighted_6 = filter_out_6 * gain_6;
+    assign weighted_7 = filter_out_7 * gain_7;
+    assign weighted_8 = filter_out_8 * gain_8;
+    assign weighted_9 = filter_out_9 * gain_9;
+    assign weighted_10 = filter_out_10 * gain_10;
+
+    // Soma das saídas dos filtros
+    wire signed [40:0] sum_out;
+    assign sum_out = weighted_1 + weighted_2 + weighted_3 + weighted_4 + weighted_5 +
+                     weighted_6 + weighted_7 + weighted_8 + weighted_9 + weighted_10;
+
+    // Truncamento para 24 bits
+    assign audio_out = sum_out[39:16]; // Ajuste o truncamento conforme necessário  24bits
+    //Precisa-se verificar os valores mais importantes a serem truncados
+    //Verificar bit [47] < por geralmente indicar sinal, garantir q volte a 24
+
+endmodule
+
+module tb_equalizer_mockado();
+    reg clk;
+    reg rst_n;
+    reg signed [23:0] audio_in;
+    wire [23:0] audio_out;
+
+    reg signed [15:0] filter_out_1, filter_out_2, filter_out_3, filter_out_4, filter_out_5;
+    reg signed [15:0] filter_out_6, filter_out_7, filter_out_8, filter_out_9, filter_out_10;
+
+    reg [12:0] gain_1, gain_2, gain_3, gain_4, gain_5;
+    reg [12:0] gain_6, gain_7, gain_8, gain_9, gain_10;
+
+    equalizer_mockado inst ( 
+        .clk(clk),
+        .rst_n(rst_n),
+        .audio_in(audio_in),
+        .audio_out(audio_out),
+        .filter_out_1(filter_out_1),
+        .filter_out_2(filter_out_2),
+        .filter_out_3(filter_out_3),
+        .filter_out_4(filter_out_4),
+        .filter_out_5(filter_out_5),
+        .filter_out_6(filter_out_6),
+        .filter_out_7(filter_out_7),
+        .filter_out_8(filter_out_8),
+        .filter_out_9(filter_out_9),
+        .filter_out_10(filter_out_10),
+        .gain_1(gain_1),
+        .gain_2(gain_2),
+        .gain_3(gain_3),
+        .gain_4(gain_4),
+        .gain_5(gain_5),
+        .gain_6(gain_6),
+        .gain_7(gain_7),
+        .gain_8(gain_8),
+        .gain_9(gain_9),
+        .gain_10(gain_10)
+    );
+
+    initial begin
+        clk = 0;
+        forever #5 clk = ~clk;
+    end
+
+    initial begin 
+        rst_n = 0;
+        audio_in = 0;
+
+
+        filter_out_1 = 0; filter_out_2 = 0; filter_out_3 = 0; filter_out_4 = 0; filter_out_5 = 0;
+        filter_out_6 = 0; filter_out_7 = 0; filter_out_8 = 0; filter_out_9 = 0; filter_out_10 = 0;
+
+        gain_1 = 0; gain_2 = 0; gain_3 = 0; gain_4 = 0; gain_5 = 0;
+        gain_6 = 0; gain_7 = 0; gain_8 = 0; gain_9 = 0; gain_10 = 0;
+            
+        #20;
+        rst_n = 1;
+        #20;
+
+        filter_out_1 = 16'sd1000; gain_1 = 16'sd2;
+        filter_out_2 = 16'sd2000; gain_2 = 16'sd3;
+        filter_out_3 = 16'sd1500; gain_3 = 16'sd4;
+        filter_out_4 = 16'sd1200; gain_4 = 16'sd5;
+        filter_out_5 = 16'sd1100; gain_5 = 16'sd6;
+        filter_out_6 = 16'sd1300; gain_6 = 16'sd7;
+        filter_out_7 = 16'sd1400; gain_7 = 16'sd8;
+        filter_out_8 = 16'sd1250; gain_8 = 16'sd9;
+        filter_out_9 = 16'sd1350; gain_9 = 16'sd10;
+        filter_out_10 = 16'sd1450; gain_10 = 16'sd11;
+
+        // entrada de audio 
+        repeat (100) begin
+            @(posedge clk);
+            audio_in = audio_in + 24'sd500;
+        end
+
+        #100;
+    end 
+
+endmodule
