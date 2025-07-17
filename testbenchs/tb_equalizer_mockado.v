@@ -1,36 +1,15 @@
 `timescale 1ns / 1ps
 module equalizer_mockado(
-  input  wire [23:0] audio_in,
+  input signed [23:0] audio_in,
   input clk,
   input rst_n,
-
-  input signed [15:0] filter_out_1,
-  input signed [15:0] filter_out_2,
-  input signed [15:0] filter_out_3,
-  input signed [15:0] filter_out_4,
-  input signed [15:0] filter_out_5,
-  input signed [15:0] filter_out_6,
-  input signed [15:0] filter_out_7,
-  input signed [15:0] filter_out_8,
-  input signed [15:0] filter_out_9,
-  input signed [15:0] filter_out_10,
-
-  input [12:0] gain_1,
-  input [12:0] gain_2,
-  input [12:0] gain_3,
-  input [12:0] gain_4,
-  input [12:0] gain_5,
-  input [12:0] gain_6,
-  input [12:0] gain_7,
-  input [12:0] gain_8,
-  input [12:0] gain_9,
-  input [12:0] gain_10,
-
+  input signed [15:0] filter_out_1, filter_out_2, filter_out_3, filter_out_4, filter_out_5,
+  input signed [15:0] filter_out_6, filter_out_7, filter_out_8, filter_out_9, filter_out_10,
+  input [12:0] gain_1, gain_2, gain_3, gain_4, gain_5,
+  input [12:0] gain_6, gain_7, gain_8, gain_9, gain_10,
   output wire [23:0] audio_out
 );
 
-
-    
     /*
     // Sinais de ganho das 10 faixas 
     // Banco de 10 registradores de 13 bits 
@@ -109,13 +88,11 @@ module tb_equalizer_mockado();
     reg clk;
     reg rst_n;
     reg signed [23:0] audio_in;
-    wire [23:0] audio_out;
-
     reg signed [15:0] filter_out_1, filter_out_2, filter_out_3, filter_out_4, filter_out_5;
     reg signed [15:0] filter_out_6, filter_out_7, filter_out_8, filter_out_9, filter_out_10;
-
     reg [12:0] gain_1, gain_2, gain_3, gain_4, gain_5;
     reg [12:0] gain_6, gain_7, gain_8, gain_9, gain_10;
+    wire [23:0] audio_out;
 
     equalizer_mockado inst ( 
         .clk(clk),
@@ -153,7 +130,6 @@ module tb_equalizer_mockado();
         rst_n = 0;
         audio_in = 0;
 
-
         filter_out_1 = 0; filter_out_2 = 0; filter_out_3 = 0; filter_out_4 = 0; filter_out_5 = 0;
         filter_out_6 = 0; filter_out_7 = 0; filter_out_8 = 0; filter_out_9 = 0; filter_out_10 = 0;
 
@@ -180,7 +156,6 @@ module tb_equalizer_mockado();
             @(posedge clk);
             audio_in = audio_in + 24'sd500;
         end
-
         #100;
     end 
 
