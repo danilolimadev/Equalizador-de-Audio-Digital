@@ -3,14 +3,20 @@
 module tb_equalizer();
     reg clk;
     reg rst_n;
-    reg signed [31:0] audio_in;
-    wire signed [31:0] audio_out;
+    reg we;
+    reg [7:0] addr;
+    reg [7:0] data_in;
+    reg signed [23:0] audio_in;
+    wire [23:0] audio_out;
 
     equalizer inst (
         .clk(clk),
         .rst_n(rst_n),
         .audio_in(audio_in),
-        .audio_out(audio_out)
+        .audio_out(audio_out),
+        .data_in(data_in),
+        .we(we),
+        .addr(addr)
     );
 
     initial begin
@@ -20,35 +26,42 @@ module tb_equalizer();
 
     initial begin
         rst_n = 0;
-        audio_in = 24'h000000;
+        we = 0;
+        addr = 0;
+        audio_in = 0;
+        data_in = 0;
         
         #20;
         rst_n = 1;
+        #20;
         
-        // espera para os filtros estabilizarem
-        #50;
+        we = 1;
+        // ganho máximo +16
+        @(posedge clk);
+        addr = 1;  data_in = 8'h10; // byte menos signficativo
+        @(posedge clk);
+        addr = 2;  data_in = 8'h00; 
+        @(posedge clk);
+        addr = 3;  data_in = 8'h00; // byte mais signficativo 
 
-        // teste 1: 0
-        audio_in = 24'h000000; #50;
-        
-        // teste 2: +0.125
-        audio_in = 24'sh100000; #50;
+        // ganho minimo -16
+        @(posedge clk);
+        addr = 4;  data_in = 8'hF0; // byte menos signficativo
+        @(posedge clk);
+        addr = 5;  data_in = 8'hFF; 
+        @(posedge clk);
+        addr = 6;  data_in = 8'hFF; // byte mais signficativo 
 
-        // teste 3: +0.5
-        audio_in = 24'sh400000; #50;
+        @(posedge clk);
+        we = 0;
+        @(posedge clk);
 
-        // teste 4: +1.0
-        audio_in = 24'sh800000; #50;
+        // entrada de audio 
+        repeat (100) begin
+            @(posedge clk);
+            audio_in = audio_in + 24'sd500;
+        end
+    end
 
-        // teste 5: -0.125
-        audio_in = 24'shF00000; #50;
-
-        // teste 6: -0.5
-        audio_in = 24'shC00000; #50;
-        
-        // teste 7: -1.0
-        audio_in = 24'sh800000; #50;
-
-end
-    
 endmodule
+
