@@ -6,7 +6,7 @@ module fir_all_filters_tb;
     reg                 clk;                  // system clock
     reg                 reset_n;              // active-low reset
     reg                 enable;               // global filter enable
-    reg signed [23:0]   input_sample;         // 24-bit input sample
+    reg signed [23:0]   audio_in;         // 24-bit input sample
 
     // Filter outputs
     wire signed [23:0]  output_lowpass;       // low-pass output
@@ -25,7 +25,7 @@ module fir_all_filters_tb;
         .clk(clk),
         .reset_n(reset_n),
         .enable(enable),
-        .input_sample(input_sample),
+        .audio_in(audio_in),
         .output_lowpass(output_lowpass),
         .output_band_64_125(output_band_64_125),
         .output_band_125_250(output_band_125_250),
@@ -46,7 +46,7 @@ module fir_all_filters_tb;
         // Initialize inputs
         reset_n      = 0;
         enable       = 0;
-        input_sample = 24'sd0;
+        audio_in = 24'sd0;
 
         // Apply reset
         #50;
@@ -56,7 +56,7 @@ module fir_all_filters_tb;
         // Ramp input sample over 6000 cycles
         repeat (6000) begin
             @(posedge clk);
-            input_sample = input_sample + 24'sd100;
+            audio_in = audio_in + 24'sd100;
         end
 
         // Finish simulation

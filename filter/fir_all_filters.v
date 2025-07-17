@@ -2,7 +2,7 @@ module fir_all_filters (
     input  wire                clk,                  // system clock
     input  wire                reset_n,              // active-low reset
     input  wire                enable,               // global filter enable
-    input  wire signed [23:0]  input_sample,         // 24-bit input sample
+    input  wire signed [23:0]  audio_in,         // 24-bit input sample
 
     output wire signed [23:0]  output_lowpass,       // low-pass output
     output wire signed [23:0]  output_band_64_125,   // 64–125 Hz band output
@@ -30,7 +30,7 @@ module fir_all_filters (
         .clk(clk),
         .reset_n(reset_n),
         .enable(enable),
-        .input_sample(input_sample),
+        .audio_in(audio_in),
         .output_sample(output_lowpass)
     );
 
@@ -42,7 +42,7 @@ module fir_all_filters (
         .clk(clk),
         .reset_n(reset_n),
         .enable(enable),
-        .input_sample(input_sample),
+        .audio_in(audio_in),
         .output_sample(output_band_64_125)
     );
 
@@ -54,7 +54,7 @@ module fir_all_filters (
         .clk(clk),
         .reset_n(reset_n),
         .enable(enable),
-        .input_sample(input_sample),
+        .audio_in(audio_in),
         .output_sample(output_band_125_250)
     );
 
@@ -66,7 +66,7 @@ module fir_all_filters (
         .clk(clk),
         .reset_n(reset_n),
         .enable(enable),
-        .input_sample(input_sample),
+        .audio_in(audio_in),
         .output_sample(output_band_250_500)
     );
 
@@ -78,7 +78,7 @@ module fir_all_filters (
         .clk(clk),
         .reset_n(reset_n),
         .enable(enable),
-        .input_sample(input_sample),
+        .audio_in(audio_in),
         .output_sample(output_band_500_1k)
     );
 
@@ -90,7 +90,7 @@ module fir_all_filters (
         .clk(clk),
         .reset_n(reset_n),
         .enable(enable),
-        .input_sample(input_sample),
+        .audio_in(audio_in),
         .output_sample(output_band_1k_2k)
     );
 
@@ -102,7 +102,7 @@ module fir_all_filters (
         .clk(clk),
         .reset_n(reset_n),
         .enable(enable),
-        .input_sample(input_sample),
+        .audio_in(audio_in),
         .output_sample(output_band_2k_4k)
     );
 
@@ -114,7 +114,7 @@ module fir_all_filters (
         .clk(clk),
         .reset_n(reset_n),
         .enable(enable),
-        .input_sample(input_sample),
+        .audio_in(audio_in),
         .output_sample(output_band_4k_8k)
     );
 
@@ -126,7 +126,7 @@ module fir_all_filters (
         .clk(clk),
         .reset_n(reset_n),
         .enable(enable),
-        .input_sample(input_sample),
+        .audio_in(audio_in),
         .output_sample(output_band_8k_16k)
     );
 
@@ -138,7 +138,7 @@ module fir_all_filters (
         .clk(clk),
         .reset_n(reset_n),
         .enable(enable),
-        .input_sample(input_sample),
+        .audio_in(audio_in),
         .output_sample(output_highpass)
     );
 
