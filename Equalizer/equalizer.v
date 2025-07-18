@@ -1,7 +1,7 @@
 module equalizer (
-    input  wire [23:0] audio_in,
+    input  signed [23:0] audio_in, 
     input clk, rst_n, 
-    output wire [23:0] audio_out
+    output [23:0] audio_out
 );
     
     // Sinais de ganho das 10 faixas 
@@ -45,7 +45,7 @@ module equalizer (
                         );
 
     // Multiplicação dos filtros pelos ganhos
-    wire signed [40:0] weighted_1, weighted_2, weighted_3, weighted_4, weighted_5,
+    wire signed [36:0] weighted_1, weighted_2, weighted_3, weighted_4, weighted_5,
                         weighted_6, weighted_7, weighted_8, weighted_9, weighted_10;
     
     assign weighted_1 = filter_out_1 * gain_1;
