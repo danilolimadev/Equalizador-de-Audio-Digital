@@ -33,7 +33,7 @@ module reg_map #(
     always @(posedge clk or negedge rst) begin
         if (!rst) begin
             for (i = 0; i < 10; i = i + 1)
-                regbank[i] <= 13'd0;
+                regbank[i] <= 13'b00001_00000000;
         end else if (we) begin
             regbank[addr] <= data_converted;
         end
