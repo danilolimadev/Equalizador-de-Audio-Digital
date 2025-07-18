@@ -1,31 +1,65 @@
 import pandas as pd
 import matplotlib.pyplot as plt
+import os
 
-# Lê o CSV exportado pelo testbench
-df = pd.read_csv("saida_filtros.csv")
+# Mapeamento dos arquivos CSV e seus respectivos títulos
+files = {
+    "burst.csv": "Burst",
+    "extreme.csv": "Extreme",
+    "hold.csv": "Hold",
+    "impulse.csv": "Impulse",
+    "noise.csv": "Noise",
+    "ramp.csv": "Ramp",
+    "step.csv": "Step"
+}
 
-# Remove espaços em branco dos nomes das colunas
-df.columns = df.columns.str.strip()
+# Caminho onde os arquivos estão localizados
+base_path = "./"  
 
-# Cria o gráfico com múltiplas curvas
-plt.figure(figsize=(14, 8))
-plt.plot(df["tempo"], df["i_data"], label="Entrada", linewidth=2, color="black")
-plt.plot(df["tempo"], df["o_lp"], label="LPF (Baixa)")
-plt.plot(df["tempo"], df["o_hp"], label="HPF (Alta)")
-plt.plot(df["tempo"], df["o_band_64_125"], label="64–125 Hz")
-plt.plot(df["tempo"], df["o_band_125_250"], label="125–250 Hz")
-plt.plot(df["tempo"], df["o_band_250_500"], label="250–500 Hz")
-plt.plot(df["tempo"], df["o_band_500_1k"], label="500–1k Hz")
-plt.plot(df["tempo"], df["o_band_1k_2k"], label="1k–2k Hz")
-plt.plot(df["tempo"], df["o_band_2k_4k"], label="2k–4k Hz")
-plt.plot(df["tempo"], df["o_band_4k_8k"], label="4k–8k Hz")
-plt.plot(df["tempo"], df["o_band_8k_16k"], label="8k–16k Hz")
+# Colunas das bandas (nomes das colunas nos arquivos CSV)
+bands = [
+    "o_lp",
+    "o_hp",
+    "o_band_64_125",
+    "o_band_125_250",
+    "o_band_250_500",
+    "o_band_500_1k",
+    "o_band_1k_2k",
+    "o_band_2k_4k",
+    "o_band_4k_8k",
+    "o_band_8k_16k"
+]
 
-# Configurações do gráfico
-plt.title("Respostas dos Filtros FIR por Banda")
-plt.xlabel("Tempo (ns)")
-plt.ylabel("Amplitude")
-plt.grid(True)
-plt.legend(loc="upper right", fontsize="small")
+# Rótulos legíveis para o eixo X
+band_labels = [
+    "LPF", "HPF", "64–125Hz", "125–250Hz", "250–500Hz", "500Hz–1k",
+    "1k–2k", "2k–4k", "4k–8k", "8k–16k"
+]
+
+# Tamanho da figura
+plt.figure(figsize=(18, 12))
+
+# Loop para processar cada arquivo
+for i, (filename, title) in enumerate(files.items(), start=1):
+    filepath = os.path.join(base_path, filename)
+    
+    try:
+        # Carrega o CSV
+        df = pd.read_csv(filepath)
+        df.columns = df.columns.str.strip()  # Remove espaços dos nomes das colunas
+
+        # Calcula a média da amplitude por banda
+        amplitudes = [df[band].mean() for band in bands]
+
+        # Cria o gráfico de barras
+        plt.subplot(3, 3, i)
+        plt.bar(band_labels, amplitudes, color='skyblue')
+        plt.title(title)
+        plt.ylabel("Amplitude Média")
+        plt.xticks(rotation=45)
+        plt.grid(axis='y')
+    except Exception as e:
+        print(f"Erro ao processar '{filename}': {e}")
+
 plt.tight_layout()
 plt.show()

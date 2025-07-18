@@ -2,36 +2,36 @@
 
 module all_filters_tb;
 
-    reg  i_clk;
-    reg  i_rst_n;
-    reg  i_en;
-    reg signed [23:0] i_data;
+    reg  clk;
+    reg  reset_n;
+    reg  enable;
+    reg signed [23:0] audio_in;
 
-    wire signed [23:0] o_lp;
-    wire signed [23:0] o_band_64_125;
-    wire signed [23:0] o_band_125_250;
-    wire signed [23:0] o_band_250_500;
-    wire signed [23:0] o_band_500_1k;
-    wire signed [23:0] o_band_1k_2k;
-    wire signed [23:0] o_band_2k_4k;
-    wire signed [23:0] o_band_4k_8k;
-    wire signed [23:0] o_band_8k_16k;
-    wire signed [23:0] o_hp;
-    wire signed [23:0] o_sum;
+    wire signed [23:0] output_lowpass;
+    wire signed [23:0] output_band_64_125;
+    wire signed [23:0] output_band_125_250;
+    wire signed [23:0] output_band_250_500;
+    wire signed [23:0] output_band_500_1k;
+    wire signed [23:0] output_band_1k_2k;
+    wire signed [23:0] output_band_2k_4k;
+    wire signed [23:0] output_band_4k_8k;
+    wire signed [23:0] output_band_8k_16k;
+    wire signed [23:0] output_highpass;
+    
 
     
     fir_all_filters uut (
-        .i_clk(i_clk), .i_rst_n(i_rst_n), .i_en(i_en), .i_data(i_data),
-        .o_lp(o_lp), .o_band_64_125(o_band_64_125), .o_band_125_250(o_band_125_250),
-        .o_band_250_500(o_band_250_500), .o_band_500_1k(o_band_500_1k),
-        .o_band_1k_2k(o_band_1k_2k), .o_band_2k_4k(o_band_2k_4k),
-        .o_band_4k_8k(o_band_4k_8k), .o_band_8k_16k(o_band_8k_16k),
-        .o_hp(o_hp), .o_sum(o_sum)
+        .clk(clk), .reset_n(reset_n), .enable(enable), .audio_in(audio_in),
+        .output_lowpass(output_lowpass), .output_band_64_125(output_band_64_125), .output_band_125_250(output_band_125_250),
+        .output_band_250_500(output_band_250_500), .output_band_500_1k(output_band_500_1k),
+        .output_band_1k_2k(output_band_1k_2k), .output_band_2k_4k(output_band_2k_4k),
+        .output_band_4k_8k(output_band_4k_8k), .output_band_8k_16k(output_band_8k_16k),
+        .output_highpass(output_highpass)
     );
 
     
-    initial i_clk = 0;
-    always #10 i_clk = ~i_clk;
+    initial clk = 0;
+    always #10 clk = ~clk;
 
     
     initial begin
@@ -39,7 +39,7 @@ module all_filters_tb;
         reset();
         enable();
 
-        impulse_test();         arquivo_saida("impulse.csv");
+        impulse_test();         arquivo_saida("impulse.csv");      
         step_test();            arquivo_saida("step.csv");
         ramp_test();            arquivo_saida("ramp.csv");
         burst_test();           arquivo_saida("burst.csv");
@@ -57,100 +57,104 @@ module all_filters_tb;
     integer N;
     integer f;
 
-        task arquivo_saida;
+
+      task arquivo_saida(input [1023:0] nome_arquivo);
         begin
-            f = $fopen("saida_filtros.csv", "w");
-            $fwrite(f, "tempo,i_data,o_lp,o_hp,o_band_64_125,o_band_125_250,o_band_250_500,o_band_500_1k,o_band_1k_2k,o_band_2k_4k,o_band_4k_8k,o_band_8k_16k\n");
+            #100;
+            f = $fopen(nome_arquivo, "w");
+            $fwrite(f, "tempo,audio_in,output_lowpass,output_highpass,output_band_64_125,output_band_125_250,output_band_250_500,output_band_500_1k,output_band_1k_2k,output_band_2k_4k,output_band_4k_8k,output_band_8k_16k\n");
 
             repeat (300) begin
-                @(posedge i_clk);
-                $fwrite(f, "%0t,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d\n", $time, i_data, o_lp, o_hp, o_band_64_125, o_band_125_250, o_band_250_500, o_band_500_1k, o_band_1k_2k, o_band_2k_4k, o_band_4k_8k, o_band_8k_16k);
+                @(posedge clk);
+                $fwrite(f, "%0t,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d\n", $time, audio_in, output_lowpass, output_highpass, output_band_64_125, output_band_125_250, output_band_250_500, output_band_500_1k, output_band_1k_2k, output_band_2k_4k, output_band_4k_8k, output_band_8k_16k);
             end
             $fclose(f);
+
         end  
     endtask
+
 
   
 
     task reset;
         begin
-            i_rst_n = 0;
-            i_en = 0;
-            i_data = 0;
-            repeat (5) @(posedge i_clk);
-            i_rst_n = 1;
+            reset_n = 0;
+            enable = 0;
+            audio_in = 0;
+            repeat (5) @(posedge clk);
+            reset_n = 1;
         end
     endtask
 
     task enable;
         begin
-            i_en = 1;
+            enable = 1;
         end
     endtask
 
     task impulse_test;
         begin
-            i_data = 24'sd1000000;
-            @(posedge i_clk);
-            i_data = 0;
-            repeat (N+10) @(posedge i_clk);
+            audio_in = 24'sd1000000;
+            @(posedge clk);
+            audio_in = 0;
+            repeat (N+10) @(posedge clk);
         end
     endtask
 
     task step_test;
         begin
-            i_data = 24'sd500000;
-            repeat (300) @(posedge i_clk);
+            audio_in = 24'sd500000;
+            repeat (300) @(posedge clk);
         end
     endtask
 
     task ramp_test;
         begin
-            i_data = 0;
+            audio_in = 0;
             repeat (500) begin
-                @(posedge i_clk);
-                i_data = i_data + 24'sd1000;
+                @(posedge clk);
+                audio_in = audio_in + 24'sd1000;
             end
         end
     endtask
 
     task burst_test;
         begin
-            i_data = 24'sd400000;
-            repeat (3) @(posedge i_clk);
-            i_data = 0;
-            repeat (300) @(posedge i_clk);
+            audio_in = 24'sd400000;
+            repeat (3) @(posedge clk);
+            audio_in = 0;
+            repeat (300) @(posedge clk);
         end
     endtask
 
     task hold_test;
         begin
-            i_data = 24'sd123456;
-            @(posedge i_clk);
-            i_en = 0;
-            i_data = 24'sd654321;
-            @(posedge i_clk);
-            i_en = 1;
+            audio_in = 24'sd123456;
+            @(posedge clk);
+            enable = 0;
+            audio_in = 24'sd654321;
+            @(posedge clk);
+            enable = 1;
         end
     endtask
 
     task noise_test;
         begin
             repeat (300) begin
-                @(posedge i_clk);
-                i_data = $random % (2**23); 
+                @(posedge clk);
+                audio_in = $random % (2**23); 
             end
         end
     endtask
 
     task extreme_value_test;
         begin
-            i_data = 24'sd8388607;
-            repeat (10) @(posedge i_clk);
-            i_data = -24'sd8388608;
-            repeat (10) @(posedge i_clk);
-            i_data = 0;
-            repeat (50) @(posedge i_clk);
+            audio_in = 24'sd8388607;
+            repeat (10) @(posedge clk);
+            audio_in = -24'sd8388608;
+            repeat (10) @(posedge clk);
+            audio_in = 0;
+            repeat (50) @(posedge clk);
         end
     endtask
 
