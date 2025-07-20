@@ -30,7 +30,7 @@ wire [23:0] audio_out;
 reg audio_valid = 0;
 wire audio_ready;
 //PARA TESTAR GERAR O ARQUIVO IGUAL, SOMENTE PARA COMPARAÇÃO
-assign audio_out = audio_in;    // Pass-through sem alteração
+//assign audio_out = audio_in;    // Pass-through sem alteração
 assign audio_ready = 1'b1;      // Sempre pronto para receber dados
 // WAV leitura
 integer wav_file;
@@ -41,6 +41,7 @@ reg [7:0] buffer [0:3];
 integer found_data = 0;
 integer data_size = 0;
 integer progress = 0;
+integer progresso_inteiro;
 integer c;
 // File parameters
 reg [7:0] header_byte;
@@ -226,9 +227,11 @@ begin
               audio_valid <= 0;
               
               j = j+1;
-              if(j>5) begin //if(j>100) begin
-                $stop;
-                $display("Progresso = %0d porcentos", (progress / data_size) * 100);
+              if(j>100) begin //if(j>100) begin
+                progresso_inteiro = (progress * 1000) / data_size;  // Escala x10 para 1 casa decimal
+                $display("Progresso = %0d.%0d%%", progresso_inteiro / 10,  // parte inteira
+                  progresso_inteiro % 10   // parte decimal (1 casa)
+                );
                 j = 0;
 
               end
