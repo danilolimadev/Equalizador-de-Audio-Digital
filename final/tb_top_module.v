@@ -112,15 +112,15 @@ begin
   rst_n = 1;
 
   ganhos1[0] = 8'd17;
-  ganhos1[1] = 8'd18;
-  ganhos1[2] = 8'd19;
-  ganhos1[3] = 8'd20;
-  ganhos1[4] = 8'd21;
-  ganhos1[5] = 8'd22;
-  ganhos1[6] = 8'd23;
-  ganhos1[7] = 8'd24;
-  ganhos1[8] = 8'd25;
-  ganhos1[9] = 8'd26;
+  ganhos1[1] = 8'd17;
+  ganhos1[2] = 8'd17;
+  ganhos1[3] = 8'd17;
+  ganhos1[4] = 8'd17;
+  ganhos1[5] = 8'd17;
+  ganhos1[6] = 8'd17;
+  ganhos1[7] = 8'd17;
+  ganhos1[8] = 8'd17;
+  ganhos1[9] = 8'd17;
 
   ganhos2[0] = 8'd11;
   ganhos2[1] = 8'd12;

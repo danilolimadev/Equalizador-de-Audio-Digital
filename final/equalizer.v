@@ -58,7 +58,7 @@ module equalizer #(
          weighted_6 + weighted_7 + weighted_8 + weighted_9 + weighted_10;
 
   // Truncamento para 24 bits
-  assign audio_out = sum_out[39:16]; // Ajuste o truncamento conforme necessário  24bits
+  assign audio_out = sum_out[40:17]; // Ajuste o truncamento conforme necessário  24bits
   // Depois é realizado o truncamento para voltar a ter 24 bits. audio_out[39:16].
   // 39 porque é desconsiderado o bit de sinal que é o bit 40.
   // E 16 porque são desconsiderados os bits menos significativos (é um arredondamento do valor).
