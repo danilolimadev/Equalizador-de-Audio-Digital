@@ -52,15 +52,21 @@ module equalizer #(
   assign weighted_9 = output_band_8k_16k * gain_9;
   assign weighted_10 = output_highpass * gain_10;
 
-  // Soma das saídas dos filtros
-  wire signed [40:0] sum_out;
-  assign sum_out = weighted_1 + weighted_2 + weighted_3 + weighted_4 + weighted_5 +
-         weighted_6 + weighted_7 + weighted_8 + weighted_9 + weighted_10;
+  // Soma em árvore binária (cada nível soma 2 resultados do nível anterior)
+  wire signed [24:0] sum_1 = weighted_1[36:13] + weighted_2[36:13];
+  wire signed [24:0] sum_2 = weighted_3[36:13] + weighted_4[36:13];
+  wire signed [24:0] sum_3 = weighted_5[36:13] + weighted_6[36:13];
+  wire signed [24:0] sum_4 = weighted_7[36:13] + weighted_8[36:13];
+  wire signed [24:0] sum_5 = weighted_9[36:13] + weighted_10[36:13];
+
+  wire signed [24:0] sum_6 = sum_1[24:1] + sum_2[24:1];
+  wire signed [24:0] sum_7 = sum_3[24:1] + sum_4[24:1];
+
+  wire signed [24:0] sum_8 = sum_6[24:1] + sum_7[24:1];
+
+  wire signed [24:0] sum_out = sum_8[24:1] + sum_5[24:1];
 
   // Truncamento para 24 bits
-  assign audio_out = sum_out[40:17]; // Ajuste o truncamento conforme necessário  24bits
-  // Depois é realizado o truncamento para voltar a ter 24 bits. audio_out[39:16].
-  // 39 porque é desconsiderado o bit de sinal que é o bit 40.
-  // E 16 porque são desconsiderados os bits menos significativos (é um arredondamento do valor).
+  assign audio_out = sum_out[24:1];
 
 endmodule
