@@ -223,11 +223,12 @@ begin
               audio_valid <= 1;
               progress = progress + 3;
 
-              #100; //Verificar esse tempo
+              //#20; //Verificar esse tempo
               audio_valid <= 0;
               
               j = j+1;
               if(j>100) begin //if(j>100) begin
+                //$stop;
                 progresso_inteiro = (progress * 1000) / data_size;  // Escala x10 para 1 casa decimal
                 $display("Progresso = %0d.%0d%%", progresso_inteiro / 10,  // parte inteira
                   progresso_inteiro % 10   // parte decimal (1 casa)
@@ -237,7 +238,7 @@ begin
               end
 
               // Espera processamento e escreve a saída no arquivo
-              #20;
+              //#20;
               if(endFile == 1) begin
                   doneFile = 1;
                   $fwrite(file_out, "%c",
