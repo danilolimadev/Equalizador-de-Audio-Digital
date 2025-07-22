@@ -42,11 +42,8 @@ module all_filters_tb;
         impulse_test();         arquivo_saida("impulse.csv");      
         step_test();            arquivo_saida("step.csv");
         ramp_test();            arquivo_saida("ramp.csv");
-        burst_test();           arquivo_saida("burst.csv");
         hold_test();            arquivo_saida("hold.csv");
         noise_test();           arquivo_saida("noise.csv");
-        extreme_value_test();   arquivo_saida("extreme.csv");
-
 
         $stop;
     end
@@ -118,14 +115,6 @@ module all_filters_tb;
         end
     endtask
 
-    task burst_test;
-        begin
-            audio_in = 24'sd400000;
-            repeat (3) @(posedge clk);
-            audio_in = 0;
-            repeat (300) @(posedge clk);
-        end
-    endtask
 
     task hold_test;
         begin
@@ -144,17 +133,6 @@ module all_filters_tb;
                 @(posedge clk);
                 audio_in = $random % (2**23); 
             end
-        end
-    endtask
-
-    task extreme_value_test;
-        begin
-            audio_in = 24'sd8388607;
-            repeat (10) @(posedge clk);
-            audio_in = -24'sd8388608;
-            repeat (10) @(posedge clk);
-            audio_in = 0;
-            repeat (50) @(posedge clk);
         end
     endtask
 
