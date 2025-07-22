@@ -4,8 +4,6 @@ import os
 
 # Mapeamento dos arquivos CSV e seus respectivos títulos
 files = {
-    "burst.csv": "Burst",
-    "extreme.csv": "Extreme",
     "hold.csv": "Hold",
     "impulse.csv": "Impulse",
     "noise.csv": "Noise",
