@@ -22,26 +22,34 @@ module fir_parameterizable_filter #(
         if (!rst_n) begin
             // Reset: zera delay line e acumulador
             for (i = 0; i < N; i = i + 1) begin
-                delay_line[i] <= 24'sd0;
+                delay_line[i] = 24'sd0;
             end
-            accumulator <= 41'sd0;
-            audio_out   <= 24'sd0;
+            accumulator = 41'sd0;
+            audio_out   = 24'sd0;
 
         end else if (enable) begin
             // Desloca a linha de atraso
             for (i = N-1; i > 0; i = i - 1) begin
-                delay_line[i] <= delay_line[i-1];
+                delay_line[i] = delay_line[i-1];
             end
-            delay_line[0] <= audio_in;
+            delay_line[0] = audio_in;
 
             // Computa MAC em loop serial usando coeficientes parâmetros
-            accumulator <= 41'sd0;
+            accumulator = 41'sd0;
             for (i = 0; i < N; i = i + 1) begin
-                accumulator <= accumulator + delay_line[i] * COEFFS[i];
+                accumulator = accumulator + delay_line[i] * COEFFS[i];
             end
 
+            /*for (i = 0; i < N; i = i + 1) begin
+                if(i==0)begin
+                    accumulator = accumulator + delay_line[i] * 12'sd4095;
+                end else begin
+                    accumulator = accumulator + delay_line[i] * 12'sd0;
+                end
+            end*/
+
             // Ajuste de ponto fixo: descarta 11 bits fracionários => mantém 24 bits de saída
-            audio_out <= accumulator[40:17];
+            audio_out = accumulator[40:17];
         end
     end
 

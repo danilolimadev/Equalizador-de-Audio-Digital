@@ -5,24 +5,18 @@ module tb_top_module;
 parameter MAX_COUNT = 10; //NUMERO DE FAIXAS
 reg clk;
 reg rst_n;
+
+//I2C
 reg scl;
 wire sda;
-
-wire [7:0] reg_addr;
-wire [7:0] reg_data;
-wire reg_we;
 reg i2c_sda_out;
 reg i2c_sda_dir;
 wire i2c_sda_in;
+parameter I2C_ADDR = 7'h6A;
+reg [7:0] ganhos1 [0:9]; //Casos de teste, ganhos de 1-10
 
 assign sda = i2c_sda_dir ? i2c_sda_out : 1'bz;
 assign i2c_sda_in = sda;
-
-wire [7:0] data_out;
-reg [7:0] data_in;
-wire data_ready;
-wire start;
-wire ack_error;
 
 // Áudio
 reg [23:0] audio_in = 0;
@@ -30,45 +24,28 @@ wire [23:0] audio_out;
 reg audio_valid = 0;
 wire audio_ready;
 //PARA TESTAR GERAR O ARQUIVO IGUAL, SOMENTE PARA COMPARAÇÃO
-//assign audio_out = audio_in;    // Pass-through sem alteração
 assign audio_ready = 1'b1;      // Sempre pronto para receber dados
+
 // WAV leitura
 integer wav_file;
 integer file_out;
 reg [7:0] b0, b1, b2; //São os 3 bytes de leitura do arquivo wav, como temos 24 bits, é necessário 3 bytes para compor
 reg [23:0] sample; //Composição com b0, b1 e b2
-reg [7:0] buffer [0:3];
+reg [7:0] buffer [0:3]; //Utilizado para análise do cabeçalho
 integer found_data = 0;
 integer data_size = 0;
 integer progress = 0;
 integer progresso_inteiro;
-integer c;
-// File parameters
+integer c; //Variável auxiliar para tratamento no cabeçalho
+
+// Parametros do arquivo
 reg [7:0] header_byte;
 integer i;
 reg doneFile; // Variável de controle
 reg [1:0] endFile; // Variavel de controle que indica o final do arquivo
 
 
-parameter I2C_ADDR = 7'h6A;
-
-reg [7:0] ganhos1 [0:9]; //Casos de teste, ganhos de 1-10
-reg [7:0] ganhos2 [0:2];
-reg [7:0] ganhos3 [0:2];
-reg [7:0] ganhos4 [0:0];
-
-wire [12:0] gain1;
-wire [12:0] gain2;
-wire [12:0] gain3;
-wire [12:0] gain4;
-wire [12:0] gain5;
-wire [12:0] gain6;
-wire [12:0] gain7;
-wire [12:0] gain8;
-wire [12:0] gain9;
-wire [12:0] gain10;
-
-integer j = 0;
+integer j = 0; //Utilizado para indicar progresso
 
 
 top_module #(.SLAVE_ADDR(I2C_ADDR)) dut (
@@ -76,19 +53,6 @@ top_module #(.SLAVE_ADDR(I2C_ADDR)) dut (
              .rst_n(rst_n),
              .scl(scl),
              .sda(sda),
-             .gain_1(gain1),
-             .gain_2(gain2),
-             .gain_3(gain3),
-             .gain_4(gain4),
-             .gain_5(gain5),
-             .gain_6(gain6),
-             .gain_7(gain7),
-             .gain_8(gain8),
-             .gain_9(gain9),
-             .gain_10(gain10),
-             .reg_addr(reg_addr),
-             .reg_data(reg_data),
-             .reg_we(reg_we),
              .audio_in(audio_in),
              .audio_out(audio_out),
              .audio_valid(audio_valid)
@@ -122,29 +86,9 @@ begin
   ganhos1[8] = 8'd17;
   ganhos1[9] = 8'd17;
 
-  ganhos2[0] = 8'd11;
-  ganhos2[1] = 8'd12;
-  ganhos2[2] = 8'd13;
-
-  ganhos3[0] = 8'd14;
-  ganhos3[1] = 8'd15;
-  ganhos3[2] = 8'd16;
-
-  ganhos4[0] = 8'd17;
-
-  $display("--- Envio sequencial 4: só o 7 ---");
-  //i2c_write_sequential_fixed(I2C_ADDR, 8'h07, 1, 4);
-
-  $display("--- Envio sequencial 3: 8 ao 10 ---");
-  //i2c_write_sequential_fixed(I2C_ADDR, 8'h08, 3, 3);
-
   $display("--- Envio sequencial 1: 1 ao 10 ---");
-  i2c_write_sequential_fixed(I2C_ADDR, 8'h01, 10, 1);
-
-  $display("--- Envio sequencial 2: 3 ao 5 ---");
-  //i2c_write_sequential_fixed(I2C_ADDR, 8'h03, 3, 2);
+  i2c_write_sequential_fixed(I2C_ADDR, 8'h01, 10);
   $display("Ganhos configurados");
-
 
   // Abrir arquivo WAV
   wav_file = $fopen("entrada_de_audio.wav", "rb"); //"rb" significa abrir o arquivo para leitura em modo binário.
@@ -271,9 +215,10 @@ begin
   $stop;
 end
 
-// TASKS atualizados com delays maiores para SCL estável e amostragem segura
 
-task i2c_write_sequential_fixed(input [6:0] slave_addr, input [7:0] start_addr, input integer count, input integer select_array);
+
+// I2C MASTER
+task i2c_write_sequential_fixed(input [6:0] slave_addr, input [7:0] start_addr, input integer count);
   integer i;
   begin
     i2c_start();
@@ -282,16 +227,7 @@ task i2c_write_sequential_fixed(input [6:0] slave_addr, input [7:0] start_addr, 
 
     for (i = 0; i < count; i = i + 1)
     begin
-      case (select_array)
-        1:
-          i2c_send_byte(ganhos1[i]);
-        2:
-          i2c_send_byte(ganhos2[i]);
-        3:
-          i2c_send_byte(ganhos3[i]);
-        4:
-          i2c_send_byte(ganhos4[i]);
-      endcase
+      i2c_send_byte(ganhos1[i]);
     end
 
     i2c_stop();

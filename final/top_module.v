@@ -6,27 +6,26 @@ module top_module #(
     input wire rst_n,
     input wire scl,
     input wire sda,
-    output wire [12:0] gain_1,
-    output wire [12:0] gain_2,
-    output wire [12:0] gain_3,
-    output wire [12:0] gain_4,
-    output wire [12:0] gain_5,
-    output wire [12:0] gain_6,
-    output wire [12:0] gain_7,
-    output wire [12:0] gain_8,
-    output wire [12:0] gain_9,
-    output wire [12:0] gain_10,
-    output wire [7:0] reg_addr,
-    output wire [7:0] reg_data,
-    output wire reg_we,
     input wire [23:0] audio_in,
     output wire [23:0] audio_out,
     input wire audio_valid
   );
   wire [7:0] data_out;
   reg [7:0] data_in;
-
   wire [2:0] i2c_state;
+  wire [12:0] gain_1;
+  wire [12:0] gain_2;
+  wire [12:0] gain_3;
+  wire [12:0] gain_4;
+  wire [12:0] gain_5;
+  wire [12:0] gain_6;
+  wire [12:0] gain_7;
+  wire [12:0] gain_8;
+  wire [12:0] gain_9;
+  wire [12:0] gain_10;
+  wire [7:0] reg_addr;
+  wire [7:0] reg_data;
+  wire reg_we;
 
   // Instância do i2c_slave
   i2c_slave #(.SLAVE_ADDR(SLAVE_ADDR)) dut (
