@@ -41,32 +41,18 @@ module equalizer #(
   wire signed [36:0] weighted_1, weighted_2, weighted_3, weighted_4, weighted_5,
        weighted_6, weighted_7, weighted_8, weighted_9, weighted_10;
 
-  assign weighted_1 = output_lowpass * gain_1;
-  assign weighted_2 = output_band_64_125 * gain_2;
-  assign weighted_3 = output_band_125_250 * gain_3;
-  assign weighted_4 = output_band_250_500 * gain_4;
-  assign weighted_5 = output_band_500_1k * gain_5;
-  assign weighted_6 = output_band_1k_2k * gain_6;
-  assign weighted_7 = output_band_2k_4k * gain_7;
-  assign weighted_8 = output_band_4k_8k * gain_8;
-  assign weighted_9 = output_band_8k_16k * gain_9;
-  assign weighted_10 = output_highpass * gain_10;
+  assign weighted_1 = (output_lowpass * gain_1) >>> 8;
+  assign weighted_2 = (output_band_64_125 * gain_2) >>> 8;
+  assign weighted_3 = (output_band_125_250 * gain_3) >>> 8;
+  assign weighted_4 = (output_band_250_500 * gain_4) >>> 8;
+  assign weighted_5 = (output_band_500_1k * gain_5) >>> 8;
+  assign weighted_6 = (output_band_1k_2k * gain_6) >>> 8;
+  assign weighted_7 = (output_band_2k_4k * gain_7) >>> 8;
+  assign weighted_8 = (output_band_4k_8k * gain_8) >>> 8;
+  assign weighted_9 = (output_band_8k_16k * gain_9) >>> 8;
+  assign weighted_10 = (output_highpass * gain_10) >>> 8;
 
-  // Soma em árvore binária (cada nível soma 2 resultados do nível anterior)
-  wire signed [24:0] sum_1 = weighted_1[36:13] + weighted_2[36:13];
-  wire signed [24:0] sum_2 = weighted_3[36:13] + weighted_4[36:13];
-  wire signed [24:0] sum_3 = weighted_5[36:13] + weighted_6[36:13];
-  wire signed [24:0] sum_4 = weighted_7[36:13] + weighted_8[36:13];
-  wire signed [24:0] sum_5 = weighted_9[36:13] + weighted_10[36:13];
-
-  wire signed [24:0] sum_6 = sum_1[24:1] + sum_2[24:1];
-  wire signed [24:0] sum_7 = sum_3[24:1] + sum_4[24:1];
-
-  wire signed [24:0] sum_8 = sum_6[24:1] + sum_7[24:1];
-
-  wire signed [24:0] sum_out = sum_8[24:1] + sum_5[24:1];
-
-  // Truncamento para 24 bits
-  assign audio_out = sum_out[24:1];
+  wire signed [39:0] sum_out = weighted_1 + weighted_2 + weighted_3 + weighted_4 + weighted_5 + weighted_6 + weighted_7 + weighted_8 + weighted_9 + weighted_10;
+  assign audio_out = sum_out[39:16];
 
 endmodule

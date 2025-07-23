@@ -35,7 +35,7 @@ reg [7:0] buffer [0:3]; //Utilizado para análise do cabeçalho
 integer found_data = 0;
 integer data_size = 0;
 integer progress = 0;
-integer progresso_inteiro;
+integer progresso_inteiro = 0;
 integer c; //Variável auxiliar para tratamento no cabeçalho
 
 // Parametros do arquivo
@@ -44,6 +44,7 @@ integer i;
 reg doneFile; // Variável de controle
 reg [1:0] endFile; // Variavel de controle que indica o final do arquivo
 
+reg teste = 0;
 
 integer j = 0; //Utilizado para indicar progresso
 
@@ -183,6 +184,7 @@ begin
 
               // Espera processamento e escreve a saída no arquivo
               //#20;
+              teste = ~teste;
               if(endFile == 1) begin
                   doneFile = 1;
                   $fwrite(file_out, "%c",
