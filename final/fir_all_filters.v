@@ -193,7 +193,6 @@ fir_parameterizable_filter #(
 
 
     // 8–16 kHz band-pass filter instance
-// 8–16 kHz band-pass filter instance (31 taps, Q1.11 coefficients embedded)
 fir_parameterizable_filter #(
     .N      (31),
     .COEFFS ('{

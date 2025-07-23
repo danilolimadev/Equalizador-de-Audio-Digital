@@ -76,30 +76,30 @@ begin
   #50;
   rst_n = 1;
 
-  ganhos1[0] = 8'd17;
-  ganhos1[1] = 8'd17;
-  ganhos1[2] = 8'd17;
-  ganhos1[3] = 8'd17;
-  ganhos1[4] = 8'd17;
-  ganhos1[5] = 8'd17;
-  ganhos1[6] = 8'd17;
-  ganhos1[7] = 8'd17;
-  ganhos1[8] = 8'd17;
-  ganhos1[9] = 8'd17;
+  ganhos1[0] = 8'd255;
+  ganhos1[1] = 8'd16;
+  ganhos1[2] = 8'd1;
+  ganhos1[3] = 8'd4;
+  ganhos1[4] = 8'd10;
+  ganhos1[5] = 8'd8;
+  ganhos1[6] = 8'd16;
+  ganhos1[7] = 8'd10;
+  ganhos1[8] = 8'd16;
+  ganhos1[9] = 8'd64;
 
   $display("--- Envio sequencial 1: 1 ao 10 ---");
-  i2c_write_sequential_fixed(I2C_ADDR, 8'h01, 10);
+  i2c_write_sequential_fixed(I2C_ADDR, 8'h00, 10);
   $display("Ganhos configurados");
 
   // Abrir arquivo WAV
-  wav_file = $fopen("entrada_de_audio.wav", "rb"); //"rb" significa abrir o arquivo para leitura em modo binário.
+  wav_file = $fopen("C:/Users/ewel1/Downloads/24_48k_PerfectTest.wav", "rb"); //"rb" significa abrir o arquivo para leitura em modo binário.
   if (wav_file == 0) begin
       $display("Erro ao abrir entrada_de_audio.wav");
       $stop;
   end
 
   // Abrir arquivo de saída
-  file_out = $fopen("output_audio.wav", "wb"); //"wb" significa abrir o arquivo para escrita em modo binário, se não existir o arquivo cria um novo
+  file_out = $fopen("C:/Users/ewel1/Downloads/output_audio.wav", "wb"); //"wb" significa abrir o arquivo para escrita em modo binário, se não existir o arquivo cria um novo
   if (file_out == 0) begin
       $display("Erro ao abrir/criar output_audio.wav");
       $stop;
