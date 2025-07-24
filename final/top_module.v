@@ -13,22 +13,22 @@ module top_module #(
   wire [7:0] data_out;
   reg [7:0] data_in;
   wire [2:0] i2c_state;
-  wire [7:0] gain_1;
-  wire [7:0] gain_2;
-  wire [7:0] gain_3;
-  wire [7:0] gain_4;
-  wire [7:0] gain_5;
-  wire [7:0] gain_6;
-  wire [7:0] gain_7;
-  wire [7:0] gain_8;
-  wire [7:0] gain_9;
-  wire [7:0] gain_10;
+  wire [12:0] gain_1;
+  wire [12:0] gain_2;
+  wire [12:0] gain_3;
+  wire [12:0] gain_4;
+  wire [12:0] gain_5;
+  wire [12:0] gain_6;
+  wire [12:0] gain_7;
+  wire [12:0] gain_8;
+  wire [12:0] gain_9;
+  wire [12:0] gain_10;
   wire [7:0] reg_addr;
   wire [7:0] reg_data;
   wire reg_we;
 
   // Instância do i2c_slave
-  i2c_slave #(.SLAVE_ADDR(SLAVE_ADDR)) i2c_slave_inst (
+  i2c_slave #(.SLAVE_ADDR(SLAVE_ADDR)) dut (
               .clk(clk),
               .rst_n(rst_n),
               .scl(scl),
@@ -43,7 +43,9 @@ module top_module #(
               .reg_we(reg_we)
             );
 
-  reg_map reg_map_inst (
+  reg_map #(
+            .GAIN_WIDTH(13)
+          ) reg_map_inst (
             .clk(clk),
             .rst_n(rst_n),
             .we(reg_we),
@@ -62,7 +64,7 @@ module top_module #(
           );
 
   equalizer #(
-              .GAIN_WIDTH(8)
+              .GAIN_WIDTH(13)
             ) equalizer_inst (
               .audio_in(audio_in),
               .clk(clk),

@@ -1,42 +1,52 @@
-module reg_map (
+module reg_map #(
+    parameter GAIN_WIDTH = 13
+  )(
     input clk,
     input rst_n,
     input we,
     input [7:0] addr,
     input [7:0] data_in,
-    output [7:0] gain_1,
-    output [7:0] gain_2,
-    output [7:0] gain_3,
-    output [7:0] gain_4,
-    output [7:0] gain_5,
-    output [7:0] gain_6,
-    output [7:0] gain_7,
-    output [7:0] gain_8,
-    output [7:0] gain_9,
-    output [7:0] gain_10
+    output [GAIN_WIDTH-1:0] gain_1,
+    output [GAIN_WIDTH-1:0] gain_2,
+    output [GAIN_WIDTH-1:0] gain_3,
+    output [GAIN_WIDTH-1:0] gain_4,
+    output [GAIN_WIDTH-1:0] gain_5,
+    output [GAIN_WIDTH-1:0] gain_6,
+    output [GAIN_WIDTH-1:0] gain_7,
+    output [GAIN_WIDTH-1:0] gain_8,
+    output [GAIN_WIDTH-1:0] gain_9,
+    output [GAIN_WIDTH-1:0] gain_10
   );
   // Banco de 10 registradores de 13 bits
-  reg [7:0] regbank [0:9];
+  reg [12:0] regbank [0:9];
+
+
+  wire [12:0] data_converted;
+
+  converter_Q5_8 converter_inst (
+                   .gain_in(data_in),
+                   .gain_out(data_converted)
+                 );
 
   // Escrita e reset
   always @(posedge clk or negedge rst_n)
   begin
     if (!rst_n)
     begin
-      regbank[0] <= 8'b0000_0000;
-      regbank[1] <= 8'b0000_0000;
-      regbank[2] <= 8'b0000_0000;
-      regbank[3] <= 8'b0000_0000;
-      regbank[4] <= 8'b0000_0000;
-      regbank[5] <= 8'b0000_0000;
-      regbank[6] <= 8'b0000_0000;
-      regbank[7] <= 8'b0000_0000;
-      regbank[8] <= 8'b0000_0000;
-      regbank[9] <= 8'b0000_0000;
+      regbank[0] <= 13'b00001_00000000;
+      regbank[1] <= 13'b00001_00000000;
+      regbank[2] <= 13'b00001_00000000;
+      regbank[3] <= 13'b00001_00000000;
+      regbank[4] <= 13'b00001_00000000;
+      regbank[5] <= 13'b00001_00000000;
+      regbank[6] <= 13'b00001_00000000;
+      regbank[7] <= 13'b00001_00000000;
+      regbank[8] <= 13'b00001_00000000;
+      regbank[9] <= 13'b00001_00000000;
     end
     else if (we)
     begin
-      regbank[addr] <= data_in;
+      regbank[addr] <= data_converted;
     end
   end
 
