@@ -2,7 +2,6 @@
 
 module tb_top_module;
 
-parameter MAX_COUNT = 10; //NUMERO DE FAIXAS
 reg clk;
 reg rst_n;
 
@@ -21,9 +20,6 @@ assign i2c_sda_in = sda;
 // Áudio
 reg [23:0] audio_in = 0;
 wire [23:0] audio_out;
-wire audio_ready;
-//PARA TESTAR GERAR O ARQUIVO IGUAL, SOMENTE PARA COMPARAÇÃO
-assign audio_ready = 1'b1;      // Sempre pronto para receber dados
 
 // WAV leitura
 integer wav_file;
@@ -70,9 +66,9 @@ begin
   #50;
   rst_n = 1;
 
-  ganhos1[0] = 8'd16;
-  ganhos1[1] = 8'd16;
-  ganhos1[2] = 8'd16;
+  ganhos1[0] = 8'd255;
+  ganhos1[1] = 8'd255;
+  ganhos1[2] = 8'd255;
   ganhos1[3] = 8'd0;
   ganhos1[4] = 8'd0;
   ganhos1[5] = 8'd0;
@@ -145,54 +141,52 @@ begin
   doneFile = 0;
   // Leitura e envio dos samples
   while (!$feof(wav_file) && !doneFile) begin
-      if (audio_ready) begin
-          if ($fread(b0, wav_file) != 1) doneFile = 1;
-          if ($fread(b1, wav_file) != 1) begin
-              endFile = 1;
-              b1 = 0;
-              b2 = 0;
-          end
-          if ($fread(b2, wav_file) != 1) begin
-              endFile = 2;
-              b2 = 0;
-          end
-          if (!doneFile) begin
-              sample = {b2, b1, b0};
-              audio_in <= sample;
-              progress = progress + 3;
-              
-              j = j+1;
-              if(j>100) begin
-                progresso_inteiro = (progress * 1000) / data_size;  // Escala x10 para 1 casa decimal
-                $display("Progresso = %0d.%0d%%", progresso_inteiro / 10,  // parte inteira
-                  progresso_inteiro % 10   // parte decimal (1 casa)
+        if ($fread(b0, wav_file) != 1) doneFile = 1;
+        if ($fread(b1, wav_file) != 1) begin
+            endFile = 1;
+            b1 = 0;
+            b2 = 0;
+        end
+        if ($fread(b2, wav_file) != 1) begin
+            endFile = 2;
+            b2 = 0;
+        end
+        if (!doneFile) begin
+            sample = {b2, b1, b0};
+            audio_in <= sample;
+            progress = progress + 3;
+            
+            j = j+1;
+            if(j>100) begin
+              progresso_inteiro = (progress * 1000) / data_size;  // Escala x10 para 1 casa decimal
+              $display("Progresso = %0d.%0d%%", progresso_inteiro / 10,  // parte inteira
+                progresso_inteiro % 10   // parte decimal (1 casa)
+              );
+              j = 0;
+
+            end
+
+            if(endFile == 1) begin
+                doneFile = 1;
+                $fwrite(file_out, "%c",
+                    audio_out[7:0]
                 );
-                j = 0;
-
-              end
-
-              if(endFile == 1) begin
-                  doneFile = 1;
-                  $fwrite(file_out, "%c",
-                      audio_out[7:0]
-                  );
-              end
-              else if(endFile == 2) begin
-                  doneFile = 1;
-                  $fwrite(file_out, "%c%c",
-                      audio_out[7:0],
-                      audio_out[15:8]
-                  );
-              end
-              else begin
-                  $fwrite(file_out, "%c%c%c",
-                      audio_out[7:0],
-                      audio_out[15:8],
-                      audio_out[23:16]
-                  );
-              end
-          end
-      end
+            end
+            else if(endFile == 2) begin
+                doneFile = 1;
+                $fwrite(file_out, "%c%c",
+                    audio_out[7:0],
+                    audio_out[15:8]
+                );
+            end
+            else begin
+                $fwrite(file_out, "%c%c%c",
+                    audio_out[7:0],
+                    audio_out[15:8],
+                    audio_out[23:16]
+                );
+            end
+        end
       #20;
   end
 
