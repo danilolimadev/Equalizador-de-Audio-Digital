@@ -21,7 +21,6 @@ assign i2c_sda_in = sda;
 // Áudio
 reg [23:0] audio_in = 0;
 wire [23:0] audio_out;
-reg audio_valid = 0;
 wire audio_ready;
 //PARA TESTAR GERAR O ARQUIVO IGUAL, SOMENTE PARA COMPARAÇÃO
 assign audio_ready = 1'b1;      // Sempre pronto para receber dados
@@ -44,10 +43,7 @@ integer i;
 reg doneFile; // Variável de controle
 reg [1:0] endFile; // Variavel de controle que indica o final do arquivo
 
-reg teste = 0;
-
 integer j = 0; //Utilizado para indicar progresso
-
 
 top_module #(.SLAVE_ADDR(I2C_ADDR)) dut (
              .clk(clk),
@@ -55,10 +51,8 @@ top_module #(.SLAVE_ADDR(I2C_ADDR)) dut (
              .scl(scl),
              .sda(sda),
              .audio_in(audio_in),
-             .audio_out(audio_out),
-             .audio_valid(audio_valid)
+             .audio_out(audio_out)
            );
-
 
 initial
 begin
@@ -76,9 +70,9 @@ begin
   #50;
   rst_n = 1;
 
-  ganhos1[0] = 8'd255;
-  ganhos1[1] = 8'd255;
-  ganhos1[2] = 8'd255;
+  ganhos1[0] = 8'd16;
+  ganhos1[1] = 8'd16;
+  ganhos1[2] = 8'd16;
   ganhos1[3] = 8'd0;
   ganhos1[4] = 8'd0;
   ganhos1[5] = 8'd0;
@@ -165,15 +159,10 @@ begin
           if (!doneFile) begin
               sample = {b2, b1, b0};
               audio_in <= sample;
-              audio_valid <= 1;
               progress = progress + 3;
-
-              //#20; //Verificar esse tempo
-              audio_valid <= 0;
               
               j = j+1;
-              if(j>100) begin //if(j>100) begin
-                //$stop;
+              if(j>100) begin
                 progresso_inteiro = (progress * 1000) / data_size;  // Escala x10 para 1 casa decimal
                 $display("Progresso = %0d.%0d%%", progresso_inteiro / 10,  // parte inteira
                   progresso_inteiro % 10   // parte decimal (1 casa)
@@ -182,9 +171,6 @@ begin
 
               end
 
-              // Espera processamento e escreve a saída no arquivo
-              //#20;
-              teste = ~teste;
               if(endFile == 1) begin
                   doneFile = 1;
                   $fwrite(file_out, "%c",
@@ -216,7 +202,6 @@ begin
   #10;
   $stop;
 end
-
 
 
 // I2C MASTER
@@ -277,7 +262,6 @@ task i2c_read_ack();
     #20;             // setup
     scl = 1;
     #100;
-    //$display("ACK recebido: %b", i2c_sda_in);
     scl = 0;
     #100;
     i2c_sda_dir = 1; // mestre retoma controle
@@ -287,7 +271,6 @@ endtask
 task i2c_send_byte(input [7:0] byte);
   integer i;
   begin
-    $display("Byte a enviar: %b", byte);
     for (i = 7; i >= 0; i = i - 1)
       i2c_send_bit(byte[i]);
     i2c_read_ack();

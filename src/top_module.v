@@ -7,8 +7,7 @@ module top_module #(
     input wire scl,
     input wire sda,
     input wire [23:0] audio_in,
-    output wire [23:0] audio_out,
-    input wire audio_valid
+    output wire [23:0] audio_out
   );
   wire [7:0] data_out;
   reg [7:0] data_in;
