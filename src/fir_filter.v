@@ -85,6 +85,6 @@ module fir_filter#(
   end
 
   // Output the final result, truncating to 24 bits
-  assign audio_out = final_sum[38:14]; // Output the lower 24 bits
+  assign audio_out = final_sum[38:15]; // Output the lower 24 bits
 
 endmodule
