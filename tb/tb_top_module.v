@@ -76,23 +76,23 @@ begin
   #50;
   rst_n = 1;
 
-  ganhos1[0] = 8'd17;
-  ganhos1[1] = 8'd17;
-  ganhos1[2] = 8'd17;
-  ganhos1[3] = 8'd17;
-  ganhos1[4] = 8'd17;
-  ganhos1[5] = 8'd17;
-  ganhos1[6] = 8'd17;
-  ganhos1[7] = 8'd17;
-  ganhos1[8] = 8'd17;
-  ganhos1[9] = 8'd17;
+  ganhos1[0] = 8'd255;
+  ganhos1[1] = 8'd255;
+  ganhos1[2] = 8'd255;
+  ganhos1[3] = 8'd0;
+  ganhos1[4] = 8'd0;
+  ganhos1[5] = 8'd0;
+  ganhos1[6] = 8'd0;
+  ganhos1[7] = 8'd0;
+  ganhos1[8] = 8'd0;
+  ganhos1[9] = 8'd0;
 
   $display("--- Envio sequencial 1: 1 ao 10 ---");
   i2c_write_sequential_fixed(I2C_ADDR, 8'h00, 10);
   $display("Ganhos configurados");
 
   // Abrir arquivo WAV
-  wav_file = $fopen("entrada_de_audio.wav", "rb"); //"rb" significa abrir o arquivo para leitura em modo binário.
+  wav_file = $fopen("24_48k_mono_PerfectTest.wav", "rb"); //"rb" significa abrir o arquivo para leitura em modo binário.
   if (wav_file == 0) begin
       $display("Erro ao abrir entrada_de_audio.wav");
       $stop;
@@ -111,7 +111,7 @@ begin
 
   doneFile = 0;
   endFile = 0;
-  while (!$feof(wav_file) && !doneFile) begin ////$feof é utilizado para verificar final do arquivo 
+  while (!$feof(wav_file) && !doneFile) begin //$feof é utilizado para verificar final do arquivo 
       buffer[0] = buffer[1];
       buffer[1] = buffer[2];
       buffer[2] = buffer[3];

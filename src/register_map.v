@@ -54,5 +54,3 @@ module reg_map (
 
 endmodule
 
-
-

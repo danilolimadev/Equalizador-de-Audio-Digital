@@ -1,5 +1,5 @@
 module equalizer #(
-    parameter GAIN_WIDTH = 13
+    parameter GAIN_WIDTH = 8
   )(
     input  signed [23:0] audio_in,
     input clk, rst_n,
@@ -25,7 +25,6 @@ module equalizer #(
   fir_all_filters inst_filter (
                     .clk(clk),
                     .rst_n(rst_n),
-                    .enable(1'b1),
                     .audio_in(audio_in),
                     .output_lowpass(output_lowpass),
                     .output_band_64_125(output_band_64_125),
@@ -43,16 +42,16 @@ module equalizer #(
   wire signed [AUDIO_WIDTH+GAIN_WIDTH-1:0] weighted_1, weighted_2, weighted_3, weighted_4, weighted_5,
        weighted_6, weighted_7, weighted_8, weighted_9, weighted_10;
 
-  assign weighted_1 = $signed(output_lowpass) * gain_1*96;
-  assign weighted_2 = $signed(output_band_64_125) * gain_2*96;
-  assign weighted_3 = $signed(output_band_125_250) * gain_3*96;
-  assign weighted_4 = $signed(output_band_250_500) * gain_4*96;
-  assign weighted_5 = $signed(output_band_500_1k) * gain_5*96;
-  assign weighted_6 = $signed(output_band_1k_2k) * gain_6*96;
-  assign weighted_7 = $signed(output_band_2k_4k) * gain_7*96;
-  assign weighted_8 = $signed(output_band_4k_8k) * gain_8*96;
-  assign weighted_9 = $signed(output_band_8k_16k) * gain_9*96;
-  assign weighted_10 = $signed(output_highpass) * gain_10*96;
+  assign weighted_1 = $signed(output_lowpass) * $signed({1'b0, gain_1});
+  assign weighted_2 = $signed(output_band_64_125) * $signed({1'b0, gain_2});
+  assign weighted_3 = $signed(output_band_125_250) * $signed({1'b0, gain_3});
+  assign weighted_4 = $signed(output_band_250_500) * $signed({1'b0, gain_4});
+  assign weighted_5 = $signed(output_band_500_1k) * $signed({1'b0, gain_5});
+  assign weighted_6 = $signed(output_band_1k_2k) * $signed({1'b0, gain_6});
+  assign weighted_7 = $signed(output_band_2k_4k) * $signed({1'b0, gain_7});
+  assign weighted_8 = $signed(output_band_4k_8k) * $signed({1'b0, gain_8});
+  assign weighted_9 = $signed(output_band_8k_16k) * $signed({1'b0, gain_9});
+  assign weighted_10 = $signed(output_highpass) * $signed({1'b0, gain_10});
 
   wire signed [AUDIO_WIDTH+GAIN_WIDTH:0] sum_out_1s1 = weighted_1 + weighted_2;
   wire signed [AUDIO_WIDTH+GAIN_WIDTH:0] sum_out_1s2 = weighted_3 + weighted_4;
