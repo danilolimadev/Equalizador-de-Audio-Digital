@@ -15,7 +15,7 @@ module reg_map (
     output [7:0] gain_9,
     output [7:0] gain_10
   );
-  // Banco de 10 registradores de 13 bits
+  // Banco de 10 registradores de 8 bits
   reg [7:0] regbank [0:9];
 
   // Escrita e reset
