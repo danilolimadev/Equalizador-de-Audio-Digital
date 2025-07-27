@@ -67,17 +67,21 @@ begin
       if (state == READ && bit_count == 0 && scl_last && !scl_sync) begin
         new_data <= 1'b1;
       end
+
+      if (state == IDLE) begin
+        option <= 1'b0;
+      end
       
       if (new_data) begin
         new_data <= 1'b0;
         if (option) begin
           reg_data <= shift_reg;
-          reg_addr <= reg_addr + 1;
+          reg_addr <= reg_addr + 1'b1;
           reg_we <= 1'b1;
         end
         else begin
           option <= 1'b1;
-          reg_addr <= shift_reg - 1;
+          reg_addr <= shift_reg - 1'b1;
         end
       end
       else begin
@@ -211,7 +215,6 @@ begin
           sda_drive <= 0;
           sda_out <= 1;
           rw_flag <= 0;
-          option <= 1'b0;
         end
 
         ADDR:
