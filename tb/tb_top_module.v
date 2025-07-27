@@ -69,12 +69,12 @@ begin
   ganhos1[0] = 8'd255;
   ganhos1[1] = 8'd255;
   ganhos1[2] = 8'd255;
-  ganhos1[3] = 8'd0;
-  ganhos1[4] = 8'd0;
-  ganhos1[5] = 8'd0;
-  ganhos1[6] = 8'd0;
-  ganhos1[7] = 8'd0;
-  ganhos1[8] = 8'd0;
+  ganhos1[3] = 8'd255;
+  ganhos1[4] = 8'd255;
+  ganhos1[5] = 8'd255;
+  ganhos1[6] = 8'd255;
+  ganhos1[7] = 8'd255;
+  ganhos1[8] = 8'd255;
   ganhos1[9] = 8'd255;
 
   $display("--- Envio sequencial 1: 1 ao 10 ---");

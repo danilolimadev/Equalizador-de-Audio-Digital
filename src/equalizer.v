@@ -66,6 +66,6 @@ module equalizer #(
 
   wire signed [AUDIO_WIDTH+GAIN_WIDTH+2:0] sum_out_4s = sum_out_3s1 + sum_out_1s5;
 
-  assign audio_out = sum_out_4s[AUDIO_WIDTH+GAIN_WIDTH+2:GAIN_WIDTH+2];
+  assign audio_out = sum_out_4s[AUDIO_WIDTH+GAIN_WIDTH+2:GAIN_WIDTH+3];
 
 endmodule

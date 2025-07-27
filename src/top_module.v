@@ -25,6 +25,9 @@ module top_module #(
   wire [7:0] reg_addr;
   wire [7:0] reg_data;
   wire reg_we;
+  wire data_ready;
+  wire ack_error;
+  wire start;
 
   // Instância do i2c_slave
   i2c_slave #(.SLAVE_ADDR(SLAVE_ADDR)) i2c_slave_inst (

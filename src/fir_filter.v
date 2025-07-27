@@ -1,11 +1,64 @@
 module fir_filter#(
-    parameter signed [11:0] COEFFS [0:31]
+    //parameter signed [11:0] COEFFS [0:31]
+    parameter signed [11:0] COEFF_00 = 0, parameter signed [11:0] COEFF_01 = 0,
+    parameter signed [11:0] COEFF_02 = 0, parameter signed [11:0] COEFF_03 = 0,
+    parameter signed [11:0] COEFF_04 = 0, parameter signed [11:0] COEFF_05 = 0,
+    parameter signed [11:0] COEFF_06 = 0, parameter signed [11:0] COEFF_07 = 0,
+    parameter signed [11:0] COEFF_08 = 0, parameter signed [11:0] COEFF_09 = 0,
+    parameter signed [11:0] COEFF_10 = 0, parameter signed [11:0] COEFF_11 = 0,
+    parameter signed [11:0] COEFF_12 = 0, parameter signed [11:0] COEFF_13 = 0,
+    parameter signed [11:0] COEFF_14 = 0, parameter signed [11:0] COEFF_15 = 0,
+    parameter signed [11:0] COEFF_16 = 0, parameter signed [11:0] COEFF_17 = 0,
+    parameter signed [11:0] COEFF_18 = 0, parameter signed [11:0] COEFF_19 = 0,
+    parameter signed [11:0] COEFF_20 = 0, parameter signed [11:0] COEFF_21 = 0,
+    parameter signed [11:0] COEFF_22 = 0, parameter signed [11:0] COEFF_23 = 0,
+    parameter signed [11:0] COEFF_24 = 0, parameter signed [11:0] COEFF_25 = 0,
+    parameter signed [11:0] COEFF_26 = 0, parameter signed [11:0] COEFF_27 = 0,
+    parameter signed [11:0] COEFF_28 = 0, parameter signed [11:0] COEFF_29 = 0,
+    parameter signed [11:0] COEFF_30 = 0, parameter signed [11:0] COEFF_31 = 0
   )(
+
     input rst_n,
     input clk,
     input [23:0] audio_in,
     output [23:0] audio_out
   );
+
+
+  wire signed [11:0] COEFFS [0:31];
+  assign COEFFS[0] = COEFF_00;
+  assign COEFFS[1] = COEFF_01;
+  assign COEFFS[2] = COEFF_02;
+  assign COEFFS[3] = COEFF_03;
+  assign COEFFS[4] = COEFF_04;
+  assign COEFFS[5] = COEFF_05;
+  assign COEFFS[6] = COEFF_06;
+  assign COEFFS[7] = COEFF_07;
+  assign COEFFS[8] = COEFF_08;
+  assign COEFFS[9] = COEFF_09;
+  assign COEFFS[10] = COEFF_10;
+  assign COEFFS[11] = COEFF_11;
+  assign COEFFS[12] = COEFF_12;
+  assign COEFFS[13] = COEFF_13;
+  assign COEFFS[14] = COEFF_14;
+  assign COEFFS[15] = COEFF_15;
+  assign COEFFS[16] = COEFF_16;
+  assign COEFFS[17] = COEFF_17;
+  assign COEFFS[18] = COEFF_18;
+  assign COEFFS[19] = COEFF_19;
+  assign COEFFS[20] = COEFF_20;
+  assign COEFFS[21] = COEFF_21;
+  assign COEFFS[22] = COEFF_22;
+  assign COEFFS[23] = COEFF_23;
+  assign COEFFS[24] = COEFF_24;
+  assign COEFFS[25] = COEFF_25;
+  assign COEFFS[26] = COEFF_26;
+  assign COEFFS[27] = COEFF_27;
+  assign COEFFS[28] = COEFF_28;
+  assign COEFFS[29] = COEFF_29;
+  assign COEFFS[30] = COEFF_30;
+  assign COEFFS[31] = COEFF_31;
+
 
   reg signed [23:0] delay_line [0:31];
   wire signed [35:0] products [0:31];
@@ -23,10 +76,12 @@ module fir_filter#(
 
   // Calculate products of coefficients and delay line values
   genvar j;
-  for (j = 0; j < 32; j = j + 1)
-  begin
-    assign products[j] = delay_line[j] * COEFFS[j];
-  end
+  generate
+    for (j = 0; j < 32; j = j + 1)
+    begin : product_block
+      assign products[j] = delay_line[j] * COEFFS[j];
+    end
+  endgenerate
 
   // First stage of summation
   wire signed [36:0] sum_stage1_0, sum_stage1_1, sum_stage1_2, sum_stage1_3, sum_stage1_4, sum_stage1_5, sum_stage1_6, sum_stage1_7, sum_stage1_8, sum_stage1_9, sum_stage1_10, sum_stage1_11, sum_stage1_12, sum_stage1_13, sum_stage1_14, sum_stage1_15;
