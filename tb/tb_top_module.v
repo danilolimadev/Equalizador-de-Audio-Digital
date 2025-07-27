@@ -75,7 +75,7 @@ begin
   ganhos1[6] = 8'd0;
   ganhos1[7] = 8'd0;
   ganhos1[8] = 8'd0;
-  ganhos1[9] = 8'd0;
+  ganhos1[9] = 8'd255;
 
   $display("--- Envio sequencial 1: 1 ao 10 ---");
   i2c_write_sequential_fixed(I2C_ADDR, 8'h00, 10);

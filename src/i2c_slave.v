@@ -5,21 +5,15 @@ module i2c_slave #(
     input wire rst_n,
     input wire scl,
     inout wire sda,
-
-
-
     output reg [7:0] data_out,
     input wire [7:0] data_in,
     output reg data_ready,
     output reg ack_error,
     output reg start,
-
     output reg [7:0] reg_addr,
     output reg [7:0] reg_data,
     output reg reg_we
   );
-
-  localparam ADDRESS = 7'b1101010;
 
   localparam IDLE      = 3'b000;
   localparam ADDR      = 3'b001;
@@ -148,7 +142,7 @@ begin
         begin
           if (scl_last && !scl_sync)
           begin
-            if (shift_reg[7:1] == ADDRESS)
+            if (shift_reg[7:1] == SLAVE_ADDR)
             begin
               if (shift_reg[0] == 0)
                 next_state = READ;
@@ -217,6 +211,7 @@ begin
           sda_drive <= 0;
           sda_out <= 1;
           rw_flag <= 0;
+          option <= 1'b0;
         end
 
         ADDR:
@@ -235,7 +230,7 @@ begin
           sda_out <= 0; // ACK = 0
           if (scl_last && !scl_sync)
           begin
-            if (shift_reg[7:1] == ADDRESS)
+            if (shift_reg[7:1] == SLAVE_ADDR)
             begin
               bit_count <= 7;
               rw_flag <= shift_reg[0];
