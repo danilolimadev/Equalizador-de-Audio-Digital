@@ -1,5 +1,3 @@
-`timescale 1ns / 1ps
-
 module equalizer_mockado #(
     parameter GAIN_WIDTH = 8
 )(
